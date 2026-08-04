@@ -51,6 +51,16 @@ class _CustomValidatorSchema(BaseModel):
         return v
 
 
+class _LeakyValidatorSchema(BaseModel):
+    code: str
+
+    @field_validator("code")
+    @classmethod
+    def validate_code_format(cls, v: str) -> str:
+        raise ValueError(f"Invalid reference: {v}")
+        return v
+
+
 def _add_test_routes(app: FastAPI) -> None:
     @app.get("/test/error")
     async def raise_error(request: Request) -> None:
@@ -66,6 +76,12 @@ def _add_test_routes(app: FastAPI) -> None:
     async def custom_validation_error(
         data: Annotated[_CustomValidatorSchema, Body()],
     ) -> _CustomValidatorSchema:
+        return data
+
+    @app.post("/test/leaky-validation")
+    async def leaky_validation_error(
+        data: Annotated[_LeakyValidatorSchema, Body()],
+    ) -> _LeakyValidatorSchema:
         return data
 
 

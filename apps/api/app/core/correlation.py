@@ -46,6 +46,7 @@ class CorrelationIdMiddleware:
             request_id = uuid.uuid4().hex
 
         token = correlation_id_ctx.set(request_id)
+        scope["correlation_id"] = request_id
 
         async def send_with_id(message: MutableMapping[str, Any]) -> None:
             if message["type"] == "http.response.start":
@@ -60,9 +61,8 @@ class CorrelationIdMiddleware:
                 )
                 message["headers"] = normalized
             await send(message)
-            if message["type"] == "http.response.body":
-                body = dict(message)
-                if not body.get("more_body", False):
-                    correlation_id_ctx.reset(token)
 
-        await self.app(scope, receive, send_with_id)
+        try:
+            await self.app(scope, receive, send_with_id)
+        finally:
+            correlation_id_ctx.reset(token)

@@ -7,6 +7,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.config import AppEnvironment, Settings
+from app.core.correlation import correlation_id_ctx
 
 
 @pytest.mark.asyncio
@@ -131,6 +132,34 @@ class TestErrorHandlingInTestingMode:
         assert received != "bad id with spaces!"
         assert len(received) == 32
 
+    async def test_correlation_context_reset_after_unhandled_error(
+        self, test_client: AsyncClient
+    ) -> None:
+        await test_client.get("/test/error")
+        assert correlation_id_ctx.get() is None
+
+    async def test_correlation_context_isolation_after_error_then_request(
+        self, test_client: AsyncClient
+    ) -> None:
+        await test_client.get("/test/error")
+        assert correlation_id_ctx.get() is None
+
+        response = await test_client.get("/health")
+        assert response.status_code == 200
+        assert correlation_id_ctx.get() is None
+
+    async def test_validation_logs_do_not_leak_rejected_value(
+        self, test_client: AsyncClient, capfd
+    ) -> None:
+        secret_value = "SECRET-12345"
+        response = await test_client.post(
+            "/test/leaky-validation",
+            json={"code": secret_value},
+        )
+        assert response.status_code == 422
+        captured = capfd.readouterr()
+        assert secret_value not in captured.out
+
 
 @pytest.mark.asyncio
 class TestErrorHandlingInProductionMode:
@@ -200,6 +229,17 @@ class TestErrorHandlingInProductionMode:
         )
         assert response.status_code == 200
         assert "access-control-allow-origin" not in response.headers
+
+    async def test_production_cors_on_unhandled_error(
+        self, prod_client: AsyncClient
+    ) -> None:
+        response = await prod_client.get(
+            "/test/error",
+            headers={"origin": "http://127.0.0.1:3000"},
+        )
+        assert response.status_code == 500
+        assert response.headers.get("access-control-allow-origin") == "http://127.0.0.1:3000"
+        assert response.headers.get("access-control-expose-headers") == "X-Request-ID"
 
     async def test_production_host_validation_blocks_unknown_hosts(
         self, prod_client: AsyncClient

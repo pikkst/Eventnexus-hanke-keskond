@@ -9,6 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException
 
+from app.config import Settings
 from app.core.correlation import CORRELATION_HEADER, get_correlation_id
 
 logger = structlog.get_logger("eventnexus.api")
@@ -46,24 +47,25 @@ def _safe_errors_for_logging(errors: Sequence[Any]) -> list[dict[str, Any]]:
         safe.append({
             "type": error.get("type", ""),
             "loc": error.get("loc", []),
-            "msg": error.get("msg", ""),
         })
     return safe
 
 
-def _merge_correlation_headers(correlation_id: str | None, extra_headers: dict[str, str] | None) -> dict[str, str]:
-    headers: dict[str, str] = {}
-    if correlation_id:
-        headers[CORRELATION_HEADER] = correlation_id
-    if extra_headers:
-        headers.update(extra_headers)
-    return headers
+def _get_correlation_id(request: Request) -> str | None:
+    return request.scope.get("correlation_id") or get_correlation_id()
 
 
-def _correlation_headers(correlation_id: str | None) -> dict[str, str]:
-    headers: dict[str, str] = {}
-    if correlation_id:
-        headers[CORRELATION_HEADER] = correlation_id
+def _cors_headers_for_origin(origin: str | None, settings: Settings) -> dict[str, str]:
+    if not origin:
+        return {}
+    if origin not in settings.cors_origins:
+        return {}
+    headers: dict[str, str] = {
+        "access-control-allow-origin": origin,
+        "access-control-allow-methods": ", ".join(settings.cors_methods),
+        "access-control-allow-headers": ", ".join(settings.cors_headers),
+        "access-control-expose-headers": "X-Request-ID",
+    }
     return headers
 
 
@@ -72,8 +74,9 @@ def register_error_handlers(app: FastAPI) -> None:
     async def unhandled_exception_handler(
         request: Request, exc: Exception
     ) -> JSONResponse:
-        correlation_id = get_correlation_id()
+        correlation_id = _get_correlation_id(request)
         is_production = request.app.state.app_env == "production"
+        settings = request.app.state.settings
 
         logger.error(
             "Unhandled exception",
@@ -99,22 +102,34 @@ def register_error_handlers(app: FastAPI) -> None:
                 "correlation_id": correlation_id,
             }
 
+        headers: dict[str, str] = {}
+        if correlation_id:
+            headers[CORRELATION_HEADER] = correlation_id
+        headers.update(_cors_headers_for_origin(request.headers.get("origin"), settings))
+
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content=content,
-            headers=_correlation_headers(correlation_id),
+            headers=headers,
         )
 
     @app.exception_handler(HTTPException)
     async def http_exception_handler(
         request: Request, exc: HTTPException
     ) -> JSONResponse:
-        correlation_id = get_correlation_id()
+        correlation_id = _get_correlation_id(request)
+        settings = request.app.state.settings
 
         extra_headers: dict[str, str] = {}
         if exc.headers:
             for key, value in exc.headers.items():
                 extra_headers[key] = value
+
+        headers: dict[str, str] = {}
+        if correlation_id:
+            headers[CORRELATION_HEADER] = correlation_id
+        headers.update(_cors_headers_for_origin(request.headers.get("origin"), settings))
+        headers.update(extra_headers)
 
         return JSONResponse(
             status_code=exc.status_code,
@@ -123,14 +138,15 @@ def register_error_handlers(app: FastAPI) -> None:
                 "error_code": "http_error",
                 "correlation_id": correlation_id,
             },
-            headers=_merge_correlation_headers(correlation_id, extra_headers),
+            headers=headers,
         )
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(
         request: Request, exc: RequestValidationError
     ) -> JSONResponse:
-        correlation_id = get_correlation_id()
+        correlation_id = _get_correlation_id(request)
+        settings = request.app.state.settings
         raw_errors = exc.errors()
         safe_errors = _safe_validation_errors(raw_errors)
         log_errors = _safe_errors_for_logging(raw_errors)
@@ -143,6 +159,11 @@ def register_error_handlers(app: FastAPI) -> None:
             correlation_id=correlation_id,
         )
 
+        headers: dict[str, str] = {}
+        if correlation_id:
+            headers[CORRELATION_HEADER] = correlation_id
+        headers.update(_cors_headers_for_origin(request.headers.get("origin"), settings))
+
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
@@ -151,5 +172,5 @@ def register_error_handlers(app: FastAPI) -> None:
                 "correlation_id": correlation_id,
                 "errors": safe_errors,
             },
-            headers=_correlation_headers(correlation_id),
+            headers=headers,
         )

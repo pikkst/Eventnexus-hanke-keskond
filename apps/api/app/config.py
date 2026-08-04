@@ -62,7 +62,7 @@ class Settings(BaseSettings):
     )
 
     cors_headers: list[str] = Field(
-        default_factory=lambda: ["Authorization", "Content-Type", "X-Requested-With"],
+        default_factory=lambda: ["Authorization", "Content-Type", "X-Requested-With", "X-Request-ID"],
         description="CORS allowed headers",
     )
 
@@ -122,7 +122,7 @@ class Settings(BaseSettings):
     @classmethod
     def validate_cors_headers(cls, v: list[str] | str | None) -> list[str]:
         if v is None:
-            return ["Authorization", "Content-Type", "X-Requested-With"]
+            return ["Authorization", "Content-Type", "X-Requested-With", "X-Request-ID"]
         if isinstance(v, str):
             return [item.strip() for item in v.split(",") if item.strip()]
         return v
