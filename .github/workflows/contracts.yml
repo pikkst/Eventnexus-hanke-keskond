@@ -1,0 +1,47 @@
+name: API Contracts
+
+on:
+  push:
+    paths:
+      - "apps/api/**"
+      - "packages/contracts/**"
+      - ".github/workflows/contracts.yml"
+  pull_request:
+    paths:
+      - "apps/api/**"
+      - "packages/contracts/**"
+      - ".github/workflows/contracts.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  verify-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install API dependencies
+        working-directory: apps/api
+        run: pip install -e .
+
+      - name: Install contracts tooling
+        working-directory: packages/contracts
+        run: npm ci
+
+      - name: Generate contracts
+        working-directory: packages/contracts
+        run: npm run generate
+
+      - name: Check for uncommitted changes
+        run: |
+          if ! git diff --exit-code; then
+            echo "::error::Generated contract files are out of date."
+            echo "Run 'npm run generate' in packages/contracts/ and commit the changes."
+            exit 1
+          fi

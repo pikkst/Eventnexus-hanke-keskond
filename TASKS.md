@@ -231,12 +231,12 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - duplicate execution is handled safely;
     - timeout and retry behavior are tested.
 
-- [ ] **S1-T05 — Add shared API contracts package**
-  - Create a versioned approach for sharing generated OpenAPI types or schemas with the frontend.
-  - Acceptance:
-    - frontend does not maintain manually divergent API types;
-    - contract generation is reproducible;
-    - CI detects uncommitted generated contract changes if generated files are committed.
+- [x] **S1-T05 — Add shared API contracts package**
+   - Create a versioned approach for sharing generated OpenAPI types or schemas with the frontend.
+   - Acceptance:
+     - frontend does not maintain manually divergent API types;
+     - contract generation is reproducible;
+     - CI detects uncommitted generated contract changes if generated files are committed.
 
 ## Sprint 1.2 — Docker development environment
 

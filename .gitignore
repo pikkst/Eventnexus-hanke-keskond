@@ -30,6 +30,8 @@ credentials.json
 *.min.css
 coverage/
 dist/
+!packages/contracts/dist/
+!packages/contracts/dist/**
 build/
 out/
 bin/

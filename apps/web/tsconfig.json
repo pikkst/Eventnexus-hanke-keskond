@@ -5,6 +5,9 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@eventnexus/contracts": [
+        "../../packages/contracts/dist/index"
       ]
     },
     "lib": [

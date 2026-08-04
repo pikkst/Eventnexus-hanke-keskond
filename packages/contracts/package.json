@@ -1,0 +1,14 @@
+{
+  "name": "@eventnexus/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared API contracts generated from the FastAPI OpenAPI schema",
+  "scripts": {
+    "generate:py": "python scripts/generate.py",
+    "generate:ts": "openapi-typescript dist/openapi.json -o dist/index.ts",
+    "generate": "npm run generate:py && npm run generate:ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.0"
+  }
+}
