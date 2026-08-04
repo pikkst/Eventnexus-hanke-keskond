@@ -14,7 +14,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   verify-contracts:
@@ -45,3 +44,11 @@ jobs:
             echo "Run 'npm run generate' in packages/contracts/ and commit the changes."
             exit 1
           fi
+
+      - name: Install web dependencies
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Type-check frontend against contracts
+        working-directory: apps/web
+        run: npm run typecheck
