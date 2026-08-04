@@ -23,17 +23,18 @@ credentials.json
 /temp/
 /cache/
 
-# Generated files (root-anchored)
+# Generated files (root-anchored for project root, any-depth for app/package outputs)
 /generated/
 *.generated.*
 *.min.js
 *.min.css
-/coverage/
-/dist/
-/build/
-/out/
-/bin/
-/obj/
+coverage/
+dist/
+build/
+out/
+bin/
+obj/
+.next/
 
 # Local tender data directory (root-anchored)
 /local-tender-data/

@@ -206,7 +206,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - `git check-ignore -v` confirmed source paths like `apps/api/app/db/models.py` and `apps/api/db/models.py` are NOT ignored;
     - `.gitattributes` uses `* text=auto eol=lf` baseline with CRLF overrides only for Windows scripts (`*.ps1`, `*.bat`, `*.cmd`);
     - `.editorconfig`, `.gitattributes`, and `.gitignore` all have terminating newlines;
-    - `.gitkeep` placeholders present in all 27 empty directories.
+    - `.gitkeep` placeholders present in all 26 empty directories.
 
 - [ ] **S1-T02 — Bootstrap Next.js web application**
   - Use TypeScript strict mode and current stable supported dependencies.
