@@ -2,8 +2,9 @@
 
 Local-first, AI-assisted procurement intelligence and tender preparation workspace for **Eventnexus OÜ**.
 
-> **Status:** Phase 0 research and policy documentation complete; application implementation has not started  
-> **Next implementation task:** `S1-T01 — Create repository skeleton`  
+> **Status:** Phase 1 local platform foundation in progress  
+> **Current implementation order:** Continue from the first incomplete dependency-safe task in `TASKS.md`  
+> **Initial product mode:** STARTER-first opportunity, partnership, and growth analysis  
 > **Primary market:** Estonia  
 > **Default product language:** Estonian (`et-EE`)  
 > **Tender languages:** Estonian and English, with original-language preservation  
@@ -17,6 +18,7 @@ EventNexus Hanke Keskond is intended to help Eventnexus OÜ:
 - discover relevant Estonian and EU IT procurement opportunities;
 - preserve source notices, documents, amendments, and versions;
 - assess eligibility, strategic fit, capacity, evidence, and risk;
+- distinguish realistic direct bids, partner opportunities, growth targets, and no-go cases;
 - extract and review tender requirements with source citations;
 - manage a traceable compliance matrix;
 - conduct bounded, source-grounded research;
@@ -38,7 +40,7 @@ The MVP must not:
 - bypass authentication, CAPTCHA, rate limits, or portal controls;
 - store ID-card PINs, Smart-ID or Mobile-ID secrets, private signing keys, portal passwords, or reusable identity credentials;
 - sign, submit, withdraw, or email a binding tender response automatically;
-- invent company references, staff experience, certifications, financial data, customers, prices, or compliance statements;
+- invent company references, staff experience, certifications, financial data, customers, prices, partners, availability, or compliance statements;
 - describe Gemini processing as local or fully offline;
 - expose restricted content to external AI without an approved policy path;
 - use undocumented RHR behavior as a production contract;
@@ -55,6 +57,7 @@ Coding agents and human contributors must read [`AGENTS.md`](AGENTS.md) complete
 | [`TASKS.md`](TASKS.md) | Executable backlog, dependencies, acceptance criteria, milestone gates, and task status |
 | [`AGENTS.md`](AGENTS.md) | Engineering workflow, mandatory document map, security rules, architecture boundaries, tests, and Definition of Done |
 | [`docs/product/PRODUCT_REQUIREMENTS.md`](docs/product/PRODUCT_REQUIREMENTS.md) | Users, outcomes, MVP scope, language requirements, and product behavior |
+| [`docs/product/STARTER_MODE.md`](docs/product/STARTER_MODE.md) | STARTER maturity, low-barrier opportunity, hard-blocker, direct/partner/growth/no-go, partner-brief, and growth-roadmap rules |
 | [`docs/product/COMPANY_PROFILE_REQUIREMENTS.md`](docs/product/COMPANY_PROFILE_REQUIREMENTS.md) | Company facts, evidence, validity, sensitivity, preferences, capacity, and derived values |
 | [`docs/product/TENDER_LIFECYCLE.md`](docs/product/TENDER_LIFECYCLE.md) | Authoritative opportunity and tender-workspace state machines |
 | [`docs/product/PILOT_SUCCESS_METRICS.md`](docs/product/PILOT_SUCCESS_METRICS.md) | Pilot metrics, formulas, targets, and evaluation mapping |
@@ -73,13 +76,46 @@ Coding agents and human contributors must read [`AGENTS.md`](AGENTS.md) complete
 
 Do not implement a governed area from this README alone. The domain-specific document is authoritative.
 
+### 3.1 STARTER-first product priority
+
+EventNexus is initially optimized for Eventnexus OÜ as a real early-stage company rather than an assumed mature bidder.
+
+The product-owner baseline is an existing company with `0 EUR` turnover and one available worker. Those onboarding values remain pending normal evidence verification. The system must not assume references, partners, certifications, financial capacity, or additional personnel.
+
+The first useful workflow classifies opportunities as:
+
+```text
+DIRECT_BID
+PARTNER_OPPORTUNITY
+GROWTH_TARGET
+NO_GO
+```
+
+Known hard blockers are evaluated before weighted fit scores. Direct fit and partner fit are separate. A small contract value does not by itself make an opportunity low-barrier.
+
+The initial useful vertical slice is:
+
+```text
+company onboarding and evidence readiness
+→ manual tender package import
+→ eligibility and threshold extraction
+→ company-versus-requirement comparison
+→ hard-blocker review
+→ STARTER classification
+→ partner brief or growth actions
+→ human decision and feedback
+```
+
+The authoritative requirements, workstream tasks, and STARTER pilot metrics are in [`docs/product/STARTER_MODE.md`](docs/product/STARTER_MODE.md).
+
 ## 4. Current project state
 
-Phase 0 tasks `S0-T01` through `S0-T15` are complete as research and documentation work.
+Phase 0 tasks `S0-T01` through `S0-T15` are complete as research and documentation work. Repository foundation work has started.
 
 The repository currently contains:
 
 - product requirements and lifecycle definitions;
+- STARTER-first opportunity and growth strategy;
 - company-profile and evidence requirements;
 - RHR and TED discovery decisions;
 - source freshness and synchronization policy;
@@ -89,9 +125,9 @@ The repository currently contains:
 - human-controlled submission policy;
 - legal and review checkpoints;
 - sanitized offline RHR and TED fixtures;
-- the complete implementation backlog.
+- the implementation backlog and initial monorepo skeleton.
 
-No application, Docker stack, database schema, CI pipeline, or executable product code exists yet. Those begin in Phase 1.
+Application services, the complete Docker stack, database schema, CI pipeline, and end-to-end product workflows are still under construction.
 
 ### 4.1 Formal M0 approvals
 
@@ -136,7 +172,7 @@ CANCELLED_BY_BUYER
 ARCHIVED
 ```
 
-Only an authorized human can record final `GO` or `NO_GO`. AI may recommend a decision but cannot perform it.
+Only an authorized human can record final `GO` or `NO_GO`. AI may recommend a decision but cannot perform it. STARTER classifications are analysis outputs and do not replace lifecycle decisions.
 
 ### 6.2 Tender workspace lifecycle
 
@@ -254,6 +290,9 @@ Material technology changes require an ADR.
 - changed content creates a new version;
 - citations identify an immutable source version and location;
 - generated company claims require approved evidence or explicit unresolved status;
+- user-confirmed onboarding values remain distinct from verified facts;
+- hard blockers are evaluated before weighted opportunity scores;
+- partner capability counts only when its evidence, permission, commitment, and tender applicability are valid;
 - approvals identify an exact version and content hash;
 - source changes can invalidate dependent approvals without deleting history;
 - deadlines preserve original text, source timezone, parsed UTC value, and parsing confidence;
@@ -283,7 +322,7 @@ Initial pilot hard limits are defined in [`AI_COST_POLICY.md`](docs/security/AI_
 
 ## 11. Planned repository structure
 
-The repository skeleton created by `S1-T01` must preserve the Phase 0 documentation and fixture paths while adding implementation directories.
+The repository skeleton created by `S1-T01` preserves the Phase 0 documentation and fixture paths while implementation directories are populated by later tasks.
 
 ```text
 .
@@ -353,16 +392,17 @@ git clone https://github.com/pikkst/Eventnexus-hanke-keskond.git
 cd Eventnexus-hanke-keskond
 ```
 
-Before the first change:
+Before each change:
 
 1. read `README.md`, `AGENTS.md`, and the active task in `TASKS.md`;
-2. read `docs/product/PHASE_0_READINESS_REVIEW.md`;
-3. select the canonical documents required by the task using the matrix in `AGENTS.md`;
-4. confirm that no real secrets, personal data, or tender documents are being added;
-5. start with `S1-T01 — Create repository skeleton`;
-6. use focused conventional commits and update `TASKS.md` only after acceptance criteria are verified.
+2. read `docs/product/PHASE_0_READINESS_REVIEW.md` when the task touches Phase 0 decisions or governed integrations;
+3. read `docs/product/STARTER_MODE.md` for company onboarding, matching, GO/NO-GO, partner, growth, opportunity ranking, or related UI work;
+4. select the full canonical document set required by `AGENTS.md`;
+5. confirm that no real secrets, personal data, or tender documents are being added;
+6. work on a focused branch unless direct default-branch work was explicitly approved;
+7. use focused conventional commits and update task status only after acceptance criteria are verified.
 
-At the current repository state, commands such as `make test` or `docker compose up` do not exist yet. Do not interpret their absence as a failure; creating the foundation is the next phase.
+Commands such as root-level `make test` or the complete `docker compose up` stack are introduced incrementally by their scheduled Phase 1 tasks. Do not interpret their absence before those tasks as a product failure.
 
 ## 13. Planned root commands
 
@@ -397,6 +437,11 @@ The MVP is not complete until:
 - the approved RHR path, TED adapter, and manual import work;
 - source and document versions remain immutable and citeable;
 - parsing and OCR produce visible quality information;
+- the STARTER onboarding profile preserves verified, pending, and unknown states;
+- known hard blockers prevent unsafe direct-bid classifications;
+- direct fit and partner fit are reported separately;
+- `DIRECT_BID`, `PARTNER_OPPORTUNITY`, `GROWTH_TARGET`, and `NO_GO` are explainable and human-reviewed;
+- partner briefs and growth actions are evidence-backed;
 - matching and GO/NO-GO decisions are explainable and human-controlled;
 - requirements and the compliance matrix are reviewable and source-grounded;
 - Gemini use is policy-gated, schema-validated, cost-limited, and audited;
@@ -406,14 +451,14 @@ The MVP is not complete until:
 - DOCX/PDF export, manifest, package hash, and checklist work;
 - submission remains human-controlled;
 - backup and restore are tested;
-- security, AI-quality, and pilot gates pass;
+- security, AI-quality, STARTER, and pilot gates pass;
 - required user, administrator, security, integration, and recovery documentation exists.
 
-The detailed release gate is maintained in [`TASKS.md`](TASKS.md).
+The detailed release gate is maintained in [`TASKS.md`](TASKS.md), with the STARTER workstream defined in [`STARTER_MODE.md`](docs/product/STARTER_MODE.md).
 
 ## 15. Legal and operational notice
 
-This repository does not provide legal advice. Procurement requirements, laws, official notices, source interfaces, deadlines, data-processing terms, and submission rules are time-sensitive and must be rechecked against current official sources before production use.
+This repository does not provide legal advice. Procurement requirements, laws, official notices, source interfaces, deadlines, data-processing terms, collaboration structures, and submission rules are time-sensitive and must be rechecked against current official sources before production use.
 
 ## 16. License
 
