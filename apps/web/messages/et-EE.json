@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "title": "Eventnexus Hanke Keskond",
+    "description": "Kohalik hangete analüüsi ja pakkumuste ettevalmistamise süsteem"
+  },
+  "common": {
+    "appName": "Eventnexus",
+    "save": "Salvesta",
+    "cancel": "Tühista",
+    "close": "Sulge",
+    "confirm": "Kinnita",
+    "loading": "Laadimine…",
+    "error": "Tekkis viga",
+    "language": "Keel",
+    "navigation": {
+      "home": "Avaleht",
+      "opportunities": "Võimalused",
+      "about": "Meist"
+    }
+  },
+  "home": {
+    "title": "Tere tulemast Eventnexusse",
+    "subtitle": "Kohalikud Eesti ja EL-i riigihanked",
+    "cta": {
+      "primary": "Alusta otsingut",
+      "secondary": "Vaata juhiseid"
+    }
+  },
+  "header": {
+    "logo": "Eventnexus",
+    "menu": {
+      "home": "Avaleht",
+      "about": "Meist"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Vali keel",
+    "et": "Eesti",
+    "en": "Inglise"
+  },
+  "error": {
+    "title": "Midagi läks katki",
+    "description": "Lehekülge ei õnnestunud laadida.",
+    "retry": "Proovi uuesti"
+  },
+  "health": {
+    "title": "Tervisekontroll",
+    "status": {
+      "ok": "Kõik näitajad on tervislikud",
+      "error": "Avastati probleem"
+    }
+  }
+}

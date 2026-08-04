@@ -208,8 +208,8 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - `.editorconfig`, `.gitattributes`, and `.gitignore` all have terminating newlines;
     - `.gitkeep` placeholders present in all 26 empty directories.
 
-- [ ] **S1-T02 — Bootstrap Next.js web application**
-  - Use TypeScript strict mode and current stable supported dependencies.
+- [x] **S1-T02 — Bootstrap Next.js web application**
+   - Use TypeScript strict mode and current stable supported dependencies.
   - Add root layout, localization foundation, error boundary, loading state, and health page.
   - Acceptance:
     - app starts in Docker and locally;
