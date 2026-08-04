@@ -216,7 +216,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - no user-facing strings are hard-coded outside localization resources;
     - lint, typecheck, and unit test commands pass.
 
-- [ ] **S1-T03 — Bootstrap FastAPI application**
+- [x] **S1-T03 — Bootstrap FastAPI application**
   - Add typed configuration, application factory, health/readiness endpoints, safe error handling, correlation IDs, OpenAPI metadata, and structured logging.
   - Acceptance:
     - startup fails clearly on invalid critical configuration;
