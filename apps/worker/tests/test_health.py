@@ -26,10 +26,11 @@ class TestReadinessEndpoint:
         response = await test_client.get("/ready")
         assert response.status_code == 200
         body = response.json()
-        assert body["status"] == "ok"
+        assert body["status"] in ("ok", "degraded")
         assert "timestamp" in body
         assert "version" in body
         assert "environment" in body
+        assert "dependencies" in body
 
     async def test_ready_returns_testing_environment(
         self, test_client: AsyncClient

@@ -15,6 +15,13 @@ class AppEnvironment(StrEnum):
     TESTING = "testing"
 
 
+class QueueName(StrEnum):
+    DEFAULT = "default"
+    HIGH = "high"
+    LOW = "low"
+    DEAD_LETTER = "dead_letter"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
