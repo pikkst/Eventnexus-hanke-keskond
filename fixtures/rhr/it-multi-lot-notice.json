@@ -1,0 +1,46 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "system": "RHR",
+    "url": "https://riigihanked.riik.ee/rhr/api/public/v1/notice/4821118/html",
+    "notice_id": "4821118",
+    "retrieved_at": "2026-08-04T00:00:00Z",
+    "capture_type": "sanitized_public_notice_projection",
+    "schema_note": "EventNexus fixture contract, not an official RHR JSON schema"
+  },
+  "notice": {
+    "country": "EE",
+    "form_family": "competition",
+    "notice_type": "contract_notice",
+    "title": "Software development and maintenance services",
+    "procedure_reference": "288863",
+    "main_cpv": "72200000",
+    "additional_cpv": ["72250000", "72240000", "72254000"],
+    "lots": [
+      {
+        "lot_id": "LOT-0001",
+        "title": "Development and maintenance orders up to EUR 199,999 excluding VAT",
+        "contract_nature": "services",
+        "main_cpv": "72200000"
+      },
+      {
+        "lot_id": "LOT-0002",
+        "title": "Higher-value development and maintenance orders",
+        "contract_nature": "services",
+        "main_cpv": "72200000"
+      }
+    ],
+    "official_languages": ["et"],
+    "buyer_contact": {
+      "organization_only": true,
+      "natural_person_data_removed": true
+    }
+  },
+  "expected": {
+    "is_it_procurement": true,
+    "is_multi_lot": true,
+    "minimum_lot_count": 2,
+    "preserve_unknown_fields": true,
+    "raw_source_required": true
+  }
+}
