@@ -2,558 +2,301 @@
 
 Local-first, AI-assisted procurement intelligence and tender preparation workspace for **Eventnexus OÜ**.
 
-> **Project status:** Pre-alpha / architecture and delivery planning
->
-> **Primary market:** Estonia
->
-> **Primary language:** Estonian (`et-EE`), with English support where tender material requires it
->
-> **Deployment model:** Self-hosted on a local workstation or company server with Docker Compose
->
-> **AI provider:** Google Gemini API through a configurable provider adapter
-
-## 1. Product vision
-
-EventNexus Hanke Keskond helps Eventnexus OÜ discover relevant IT procurement opportunities, understand tender requirements, perform evidence-backed background research, prepare compliant bid documents, coordinate internal review, and create a submission-ready package.
-
-The system is intended to reduce repetitive procurement work without removing human responsibility. AI outputs are drafts and decision support. A named, authorized person must approve the final commercial terms, declarations, attachments, and submission.
-
-The target workflow is:
-
-1. Collect procurement notices from supported official data sources.
-2. Normalize and deduplicate opportunities.
-3. Match opportunities against the company profile, capabilities, references, exclusions, and capacity.
-4. Rank opportunities and explain the score with evidence.
-5. Create a tender workspace and ingest all available source documents.
-6. Extract requirements, dates, eligibility conditions, evaluation criteria, forms, risks, and unanswered questions.
-7. Build a traceable compliance matrix.
-8. Run controlled AI-assisted research.
-9. Draft technical, commercial, administrative, and supporting content.
-10. Review every claim, number, requirement, and attachment.
-11. Approve the package through a human-controlled workflow.
-12. Export a deterministic submission package and checklist.
-13. Record submission evidence and monitor later changes or clarification requests.
-
-## 2. Important deployment clarification
-
-The application itself runs locally in Docker and is not deployed as a public cloud service. However, Google Gemini is an external API. Any content sent to Gemini leaves the local Docker environment and is processed by Google according to the selected account, billing tier, contract, region, and applicable terms.
-
-The product must therefore never describe itself as fully offline. It is **local-first with controlled external AI processing**.
-
-Mandatory safeguards:
-
-- classify documents before AI use;
-- minimize and redact data sent to external APIs;
-- require an explicit policy for confidential, personal, security-sensitive, or restricted documents;
-- record what content was sent, to which model, for which purpose, by whom, and when;
-- allow a local-only processing path that does not call Gemini;
-- keep model names configurable instead of hard-coding a preview model;
-- use a paid/contractually approved Gemini setup for production procurement data;
-- never send secrets, credentials, private keys, access tokens, or signing material to a model.
-
-## 3. Product principles
-
-### 3.1 Human authority
-
-- AI must not autonomously submit a tender, accept contractual terms, set a final binding price, sign a declaration, or impersonate an authorized representative.
-- Every external action must show the exact payload or document to a human before execution.
-- Approval records must identify the user, timestamp, version, and content hash.
-
-### 3.2 Evidence before prose
-
-- Every extracted requirement must link to its source document, page/section, and source text span when technically possible.
-- Every generated factual claim must be linked to approved company evidence or a cited external source.
-- Unsupported claims must be labeled as assumptions or open questions.
-- The system must never invent references, certifications, staff experience, turnover, prices, dates, or compliance statements.
-
-### 3.3 Deterministic workflow
-
-- AI output must use JSON Schema or another validated structured format before entering business logic.
-- Workflow state transitions are controlled by application code, not model prose.
-- Generated files must be reproducible from versioned templates, source data, and approved content blocks.
-
-### 3.4 Local ownership
-
-- PostgreSQL, object storage, logs, prompt versions, generated files, and audit history remain under Eventnexus OÜ control.
-- Docker services bind to localhost or a private network by default.
-- External integrations are opt-in and individually configurable.
-
-### 3.5 Procurement safety
-
-- The system assists with legal and procurement work but does not replace a lawyer, procurement specialist, accountant, security officer, or authorized signatory.
-- Changes to procurement law, tender documents, deadlines, or source APIs must be treated as time-sensitive.
-- A late or incomplete package must never be marked ready merely because AI generated all sections.
-
-## 4. Scope
-
-### 4.1 MVP capabilities
-
-#### Opportunity discovery
-
-- Import Estonian procurement opportunities from approved Riigihangete Register open/public data mechanisms.
-- Import EU notices from the TED Search API.
-- Support manual URL, notice identifier, JSON/XML, ZIP, PDF, DOCX, XLSX, and email attachment import.
-- Deduplicate notices and preserve source versions.
-- Detect amendments, deadline changes, cancellations, and clarification updates when source data supports them.
-
-#### Relevance and qualification
-
-- Maintain an Eventnexus OÜ capability profile.
-- Maintain CPV interests, positive keywords, negative keywords, regions, budget ranges, contract types, technologies, security constraints, and capacity limits.
-- Produce a configurable relevance score with a transparent factor breakdown.
-- Separate factual eligibility failures from subjective strategic fit.
-- Support `GO`, `NO_GO`, `REVIEW_REQUIRED`, and `INSUFFICIENT_DATA` decisions.
-
-#### Tender workspace
-
-- Store source notices, attachments, versions, deadlines, contacts, lots, evaluation criteria, and clarification questions.
-- Parse PDF, DOCX, XLSX, TXT, HTML, XML, and common image formats.
-- Preserve original files and immutable hashes.
-- Create page- or section-aware text chunks for retrieval.
-- Track extraction quality and OCR confidence.
-
-#### Requirement analysis
-
-- Extract mandatory requirements, scored requirements, eligibility criteria, exclusion grounds, deliverables, milestones, service levels, security requirements, data protection requirements, forms, signatures, guarantees, insurance, references, team roles, pricing rules, and submission instructions.
-- Generate a compliance matrix with status, owner, source citation, evidence, response, risk, and review fields.
-- Detect conflicting dates and inconsistent requirements.
-- Generate clarification questions without sending them automatically.
-
-#### Research
-
-- Run controlled research tasks for the contracting authority, business context, technology environment, likely delivery risks, market context, partner needs, and public historical procurement information.
-- Store sources, retrieval timestamps, excerpts, and research confidence.
-- Separate public-source research from internal company evidence.
-- Require source citations for externally verifiable claims.
-
-#### Proposal drafting
-
-- Create a structured proposal outline from tender requirements.
-- Draft technical approach, implementation plan, governance, team structure, quality assurance, security, privacy, support, maintenance, risk management, sustainability, and executive summary sections.
-- Reuse only approved company content blocks and references.
-- Generate Estonian by default and support controlled English output.
-- Produce DOCX and PDF exports from versioned templates.
-- Build a final attachment manifest and submission checklist.
-
-#### Review and approval
-
-- Support role-based review of requirements, claims, pricing, legal declarations, attachments, and the final package.
-- Block approval when mandatory checks are unresolved.
-- Store immutable approval events and package hashes.
-- Allow controlled rejection, revision, and re-approval.
-
-#### Submission handoff
-
-- For the MVP, generate a submission-ready package and step-by-step handoff for the authorized user.
-- Record the submitted version, timestamp, source portal, confirmation identifier, and uploaded receipt.
-- Do not automate RHR login or final submission unless an official, permitted, tested integration is documented and approved.
-
-### 4.2 Explicit MVP non-goals
-
-- Autonomous legal advice or legal sign-off.
-- Autonomous tender submission.
-- Browser automation that bypasses portal controls, authentication requirements, CAPTCHA, rate limits, or terms of use.
-- Storing Smart-ID, Mobile-ID, ID-card PIN codes, private signing keys, or reusable signing secrets.
-- Fabricating company qualifications or staff CV content.
-- Automatic final pricing without a human commercial decision.
-- Public multi-tenant SaaS deployment.
-- Full accounting, CRM, ERP, or contract-management replacement.
-- Scraping as the default source strategy where an official API, feed, export, or manual import exists.
-
-## 5. Official source strategy
-
-### 5.1 Estonian Riigihangete Register (RHR)
-
-RHR is the primary source for Estonian public procurement notices and tender participation. The implementation must start with a documented integration discovery task.
-
-Preferred order:
-
-1. officially documented public/open-data API;
-2. officially provided downloadable open-data export;
-3. stable public notice endpoint intended for reuse;
-4. user-driven manual import;
-5. browser-assisted collection only after legal, technical, and operational approval.
-
-The adapter must not assume undocumented search endpoints are stable. Store raw source payloads and source version identifiers so parsing can be replayed.
-
-Official entry points:
-
-- https://riigihanked.riik.ee/
-- https://www.fin.ee/riigihanked-riigiabi-osalused/riigihangete-register
-- https://www.riigiteataja.ee/akt/112072025026
-
-### 5.2 Tenders Electronic Daily (TED)
-
-Use TED API 3 Search API for EU procurement notices when relevant. Implement pagination/iteration handling, query validation, rate limiting, source caching, and raw XML/JSON storage.
-
-Official documentation:
-
-- https://docs.ted.europa.eu/api/latest/search.html
-- https://docs.ted.europa.eu/api/latest/
-- https://docs.ted.europa.eu/eforms/latest/
-
-### 5.3 Other future sources
-
-Possible later integrations, each requiring a separate approval and adapter:
-
-- official company registry data;
-- Estonian public-sector document registers;
-- contracting-authority websites;
-- approved email inboxes;
-- internal CRM or project-reference sources;
-- EU funding and programme databases;
-- partner or subcontractor evidence stores.
-
-## 6. Proposed architecture
-
-```mermaid
-flowchart LR
-    U[Local browser] --> W[Next.js web application]
-    W --> A[FastAPI application API]
-    A --> DB[(PostgreSQL + pgvector)]
-    A --> OBJ[(MinIO object storage)]
-    A --> R[(Redis)]
-    A --> Q[Job queue]
-    Q --> WK[Python worker]
-    WK --> DOC[Document extraction and OCR]
-    WK --> RHR[RHR source adapter]
-    WK --> TED[TED source adapter]
-    WK --> G[Gemini provider adapter]
-    WK --> DB
-    WK --> OBJ
-    A --> AUD[Audit and approval service]
-    A --> EXP[DOCX/PDF/export service]
-    MON[Prometheus/Grafana] -. optional .-> A
-    MON -. optional .-> WK
-```
-
-### 6.1 Recommended stack
-
-| Area | Technology | Reason |
-|---|---|---|
-| Web UI | Next.js, React, TypeScript | Strong typed UI, server/client flexibility, mature document workflow ecosystem |
-| API | Python 3.12, FastAPI, Pydantic | Excellent document/AI tooling and schema validation |
-| Background jobs | Celery or Dramatiq with Redis | Retryable long-running imports, OCR, embeddings, and generation |
-| Database | PostgreSQL | Reliable transactional business data |
-| Vector search | pgvector | Keeps MVP operationally simple and local |
-| Object storage | MinIO | S3-compatible local storage for originals and generated packages |
-| AI SDK | Official Google Gen AI SDK behind an internal adapter | Avoid provider coupling in domain logic |
-| Document extraction | PyMuPDF, python-docx, openpyxl, Apache Tika where useful | Broad local format support |
-| OCR | Tesseract with Estonian and English language packs | Local scanned-document fallback |
-| Document generation | docxtpl or python-docx, LibreOffice headless for controlled PDF conversion | Template-based reproducible output |
-| Authentication | Local accounts, Argon2id, secure sessions/JWT as appropriate | Self-hosted RBAC |
-| Testing | Pytest, Vitest, Playwright, Testcontainers | Unit, integration, and end-to-end coverage |
-| Quality | Ruff, mypy, ESLint, Prettier | Enforced static quality |
-| Observability | Structured logs, OpenTelemetry, Prometheus/Grafana profile | Auditable local operation |
-
-A technology may be replaced only through an Architecture Decision Record (ADR) explaining the operational and security impact.
-
-## 7. Service boundaries
-
-### `web`
-
-- Estonian-first interface;
-- opportunity inbox and filters;
-- tender workspace;
-- document viewer with citations;
-- compliance matrix;
-- research and generation controls;
-- review and approval UI;
-- administration, policy, and audit views.
-
-### `api`
-
-- authentication and RBAC;
-- domain commands and queries;
-- workflow state transitions;
-- validation;
-- signed download links or protected local streaming;
-- audit events;
-- export orchestration;
-- external action approval gates.
-
-### `worker`
-
-- source synchronization;
-- document parsing and OCR;
-- chunking and embedding;
-- AI extraction and generation;
-- research retrieval;
-- file rendering;
-- integrity scans;
-- retries and dead-letter handling.
-
-### `source adapters`
-
-Every external procurement source implements a common contract:
-
-```text
-search(criteria) -> SourceNoticeSummary[]
-fetch_notice(source_id, version?) -> RawNotice
-fetch_documents(source_id) -> SourceDocument[]
-check_updates(cursor) -> SourceChange[]
-normalize(raw_notice) -> NormalizedOpportunity
-health_check() -> AdapterHealth
-```
-
-Adapters must preserve raw source material and must not leak source-specific assumptions into the core tender domain.
-
-### `AI provider adapter`
-
-The domain layer must call internal capabilities such as:
-
-```text
-extract_requirements(input, schema, policy)
-classify_opportunity(input, company_profile, schema)
-generate_draft(context, approved_evidence, schema)
-review_compliance(context, response, schema)
-create_research_plan(question, allowed_tools, schema)
-```
-
-It must not call a hard-coded Gemini model directly from controllers or UI code.
-
-## 8. Core domain model
-
-Minimum entities:
-
-- `User`
-- `Role`
-- `CompanyProfile`
-- `Capability`
-- `ReferenceProject`
-- `PersonProfile`
-- `PartnerProfile`
-- `SourceConnection`
-- `SourceCursor`
-- `Opportunity`
-- `OpportunityVersion`
-- `Lot`
-- `TenderWorkspace`
-- `TenderDocument`
-- `DocumentVersion`
-- `DocumentChunk`
-- `Requirement`
-- `ComplianceItem`
-- `ClarificationQuestion`
-- `ResearchTask`
-- `ResearchSource`
-- `EvidenceItem`
-- `ContentBlock`
-- `ProposalSection`
-- `PricingScenario`
-- `Review`
-- `Approval`
-- `ExportPackage`
-- `SubmissionRecord`
-- `Notification`
-- `AIInvocation`
-- `PromptTemplate`
-- `AuditEvent`
-
-Important invariants:
-
-- original source files are immutable;
-- edits create new versions;
-- citations refer to immutable document versions;
-- generated claims require evidence or explicit assumption status;
-- approvals refer to exact version hashes;
-- an approved package becomes invalid when a mandatory source document changes;
-- deadlines are stored in UTC with original timezone and source text preserved;
-- monetary values store currency, net/gross status, and calculation basis;
-- AI-generated output never directly mutates approved records.
-
-## 9. Tender lifecycle
+> **Status:** Phase 0 research and policy documentation complete; application implementation has not started  
+> **Next implementation task:** `S1-T01 — Create repository skeleton`  
+> **Primary market:** Estonia  
+> **Default product language:** Estonian (`et-EE`)  
+> **Tender languages:** Estonian and English, with original-language preservation  
+> **Deployment:** Self-hosted Docker environment on an Eventnexus-controlled workstation or server  
+> **External AI:** Google Gemini through a policy-gated provider adapter
+
+## 1. Purpose
+
+EventNexus Hanke Keskond is intended to help Eventnexus OÜ:
+
+- discover relevant Estonian and EU IT procurement opportunities;
+- preserve source notices, documents, amendments, and versions;
+- assess eligibility, strategic fit, capacity, evidence, and risk;
+- extract and review tender requirements with source citations;
+- manage a traceable compliance matrix;
+- conduct bounded, source-grounded research;
+- draft proposal content from approved company evidence;
+- coordinate technical, commercial, legal, security, and management review;
+- generate a deterministic submission package, manifest, and checklist;
+- record human submission evidence and later outcomes;
+- retain an auditable history of material decisions.
+
+The product assists people. It does not replace procurement, legal, security, financial, or authorized-signatory responsibility.
+
+## 2. Non-negotiable MVP boundaries
+
+The MVP must not:
+
+- autonomously decide final participation;
+- autonomously approve binding claims, prices, declarations, or commitments;
+- log in to RHR or another portal on behalf of a user;
+- bypass authentication, CAPTCHA, rate limits, or portal controls;
+- store ID-card PINs, Smart-ID or Mobile-ID secrets, private signing keys, portal passwords, or reusable identity credentials;
+- sign, submit, withdraw, or email a binding tender response automatically;
+- invent company references, staff experience, certifications, financial data, customers, prices, or compliance statements;
+- describe Gemini processing as local or fully offline;
+- expose restricted content to external AI without an approved policy path;
+- use undocumented RHR behavior as a production contract;
+- treat model prose as an authorization or workflow transition.
+
+An authorized human remains responsible for the final participation decision, commercial terms, declarations, package approval, signature, and official submission.
+
+## 3. Read before implementation
+
+Coding agents and human contributors must read [`AGENTS.md`](AGENTS.md) completely before changing the repository.
+
+| Document | Authority |
+|---|---|
+| [`TASKS.md`](TASKS.md) | Executable backlog, dependencies, acceptance criteria, milestone gates, and task status |
+| [`AGENTS.md`](AGENTS.md) | Engineering workflow, mandatory document map, security rules, architecture boundaries, tests, and Definition of Done |
+| [`docs/product/PRODUCT_REQUIREMENTS.md`](docs/product/PRODUCT_REQUIREMENTS.md) | Users, outcomes, MVP scope, language requirements, and product behavior |
+| [`docs/product/COMPANY_PROFILE_REQUIREMENTS.md`](docs/product/COMPANY_PROFILE_REQUIREMENTS.md) | Company facts, evidence, validity, sensitivity, preferences, capacity, and derived values |
+| [`docs/product/TENDER_LIFECYCLE.md`](docs/product/TENDER_LIFECYCLE.md) | Authoritative opportunity and tender-workspace state machines |
+| [`docs/product/PILOT_SUCCESS_METRICS.md`](docs/product/PILOT_SUCCESS_METRICS.md) | Pilot metrics, formulas, targets, and evaluation mapping |
+| [`docs/product/PHASE_0_READINESS_REVIEW.md`](docs/product/PHASE_0_READINESS_REVIEW.md) | Phase 0 decisions, remaining approvals, deferred decisions, and entry conditions |
+| [`docs/integrations/RHR_DISCOVERY.md`](docs/integrations/RHR_DISCOVERY.md) | Permitted MVP RHR ingestion path and prohibited assumptions |
+| [`docs/adr/ADR-001-rhr-ingestion-strategy.md`](docs/adr/ADR-001-rhr-ingestion-strategy.md) | Accepted initial RHR architecture decision |
+| [`docs/integrations/TED_DISCOVERY.md`](docs/integrations/TED_DISCOVERY.md) | TED Search API v3 contract, queries, pagination, mapping, and replay |
+| [`docs/integrations/SOURCE_FRESHNESS_POLICY.md`](docs/integrations/SOURCE_FRESHNESS_POLICY.md) | Polling, backoff, source outage, cursor recovery, amendments, and freshness |
+| [`docs/security/GEMINI_DATA_POLICY.md`](docs/security/GEMINI_DATA_POLICY.md) | Gemini account, data use, feature, retention, and production enablement policy |
+| [`docs/security/DOCUMENT_CLASSIFICATION_POLICY.md`](docs/security/DOCUMENT_CLASSIFICATION_POLICY.md) | Data classifications and permitted local/external processing |
+| [`docs/security/AI_THREAT_MODEL.md`](docs/security/AI_THREAT_MODEL.md) | AI threats, controls, residual risks, and security-test mapping |
+| [`docs/security/AI_COST_POLICY.md`](docs/security/AI_COST_POLICY.md) | AI budgets, warnings, hard limits, approvals, and emergency stop |
+| [`docs/procurement/SUBMISSION_POLICY.md`](docs/procurement/SUBMISSION_POLICY.md) | Human submission boundary, evidence, and package handoff |
+| [`docs/integrations/RHR_SUBMISSION_INTEGRATION_DISCOVERY.md`](docs/integrations/RHR_SUBMISSION_INTEGRATION_DISCOVERY.md) | Current `UNSUPPORTED_FOR_MVP` submission-integration conclusion |
+| [`docs/legal/LEGAL_REVIEW_CHECKPOINTS.md`](docs/legal/LEGAL_REVIEW_CHECKPOINTS.md) | Required legal, procurement, privacy, security, commercial, and signatory review |
+
+Do not implement a governed area from this README alone. The domain-specific document is authoritative.
+
+## 4. Current project state
+
+Phase 0 tasks `S0-T01` through `S0-T15` are complete as research and documentation work.
+
+The repository currently contains:
+
+- product requirements and lifecycle definitions;
+- company-profile and evidence requirements;
+- RHR and TED discovery decisions;
+- source freshness and synchronization policy;
+- Gemini data-processing policy;
+- document classification policy;
+- AI threat and cost policies;
+- human-controlled submission policy;
+- legal and review checkpoints;
+- sanitized offline RHR and TED fixtures;
+- the complete implementation backlog.
+
+No application, Docker stack, database schema, CI pipeline, or executable product code exists yet. Those begin in Phase 1.
+
+### 4.1 Formal M0 approvals
+
+Completed research tasks are not the same as organizational approval. The current M0 approval status remains in [`TASKS.md`](TASKS.md) and [`PHASE_0_READINESS_REVIEW.md`](docs/product/PHASE_0_READINESS_REVIEW.md).
+
+Repository scaffolding and other reversible, secret-free Phase 1 foundation work may proceed while approval records are being finalized. Do not enable real-data Gemini processing, broader RHR automation, production source synchronization, or submission-related automation until the relevant policy and decision owners have approved them.
+
+## 5. Users and authority
+
+Canonical role behavior is defined in the product requirements and lifecycle documents.
+
+| Role | Core authority |
+|---|---|
+| `BID_LEAD` | Daily opportunity triage, analysis coordination, workspace management, assignments, and readiness preparation |
+| `AUTHORIZED_BUSINESS_DECISION_MAKER` | Final GO/NO-GO, binding commercial risk, declarations, and exact package approval |
+| `AUTHORIZED_SUBMITTER` | Human submission through the official channel and submission-evidence recording |
+| `TECHNICAL_REVIEWER` | Technical feasibility, architecture, staffing, delivery, and technical claim review |
+| `COMMERCIAL_REVIEWER` | Pricing, margin, guarantees, payment terms, and financial exposure review |
+| `LEGAL_COMPLIANCE_REVIEWER` | Legal, contractual, eligibility, exclusion, and regulatory review |
+| `SECURITY_PRIVACY_REVIEWER` | Security, privacy, data location, restricted data, and external-AI review |
+| `CONTRIBUTOR` | Assigned drafting and evidence work without approval authority |
+| `SYSTEM_ADMIN` | Local system operation and configuration without implied business approval authority |
+| `AUDITOR` | Permission-scoped read-only review and reporting |
+
+A small company may assign several roles to one person, but every protected action must record which authority was exercised.
+
+## 6. Authoritative lifecycle summary
+
+The product has two separate state machines. Exact transitions, permissions, gates, and invalidation behavior are defined in [`TENDER_LIFECYCLE.md`](docs/product/TENDER_LIFECYCLE.md).
+
+### 6.1 Opportunity lifecycle
 
 ```text
 DISCOVERED
-  -> TRIAGE_REQUIRED
-  -> QUALIFICATION_IN_PROGRESS
-  -> GO | NO_GO | ON_HOLD
-  -> DOCUMENTS_INCOMPLETE
-  -> ANALYSIS_IN_PROGRESS
-  -> DRAFTING
-  -> INTERNAL_REVIEW
-  -> CHANGES_REQUIRED
-  -> APPROVAL_PENDING
-  -> APPROVED_FOR_SUBMISSION
-  -> SUBMISSION_IN_PROGRESS
-  -> SUBMITTED
-  -> CLARIFICATION
-  -> AWARDED | NOT_AWARDED | CANCELLED | WITHDRAWN
-  -> ARCHIVED
+TRIAGE_REQUIRED
+ANALYSIS_IN_PROGRESS
+NEEDS_MORE_INFORMATION
+GO
+NO_GO
+WATCHING
+CANCELLED_BY_BUYER
+ARCHIVED
 ```
 
-State changes must be permission-checked, validated, and audited. The model can recommend a transition but cannot perform protected transitions without application and human authorization.
+Only an authorized human can record final `GO` or `NO_GO`. AI may recommend a decision but cannot perform it.
 
-## 10. AI and RAG design
+### 6.2 Tender workspace lifecycle
 
-### 10.1 Retrieval
-
-- Index normalized document chunks locally in PostgreSQL/pgvector.
-- Store chunk metadata: document version, page, heading path, table identity, language, parser, OCR confidence, and checksum.
-- Use hybrid retrieval: lexical filtering plus vector similarity.
-- Apply tender, workspace, document, lot, and confidentiality filters before retrieval.
-- Return citations as stable internal IDs, never only as model-created page labels.
-
-### 10.2 Generation
-
-- Use structured outputs for extraction, classification, compliance review, and generation plans.
-- Validate all responses with Pydantic.
-- Reject and retry schema-invalid results using bounded retries.
-- Separate planning, evidence retrieval, drafting, and validation.
-- Use low-variance settings for extraction and compliance tasks.
-- Store prompt template version, model identifier, token usage, latency, safety result, and response hash.
-
-### 10.3 Model routing
-
-Configuration must support separate models for:
-
-- fast classification;
-- complex tender analysis;
-- long-context document review;
-- final language polishing;
-- embeddings;
-- optional local fallback.
-
-Example environment variables must use placeholders, not assumptions about the newest model:
-
-```dotenv
-GEMINI_API_KEY=
-GEMINI_CLASSIFIER_MODEL=
-GEMINI_ANALYSIS_MODEL=
-GEMINI_DRAFT_MODEL=
-GEMINI_REVIEW_MODEL=
-GEMINI_EMBEDDING_MODEL=
-AI_EXTERNAL_PROCESSING_ENABLED=false
+```text
+DRAFT_INTAKE
+SOURCE_REVIEW
+REQUIREMENT_REVIEW
+PLANNING
+DRAFTING
+INTERNAL_REVIEW
+CHANGES_REQUIRED
+READY_FOR_APPROVAL
+APPROVED_FOR_EXPORT
+PACKAGE_GENERATED
+APPROVED_FOR_SUBMISSION
+SUBMITTED
+SUBMISSION_FAILED
+WITHDRAWN
+CLARIFICATION
+AWARDED
+NOT_AWARDED
+CANCELLED
+CLOSED
 ```
 
-### 10.4 Guardrails
+Source amendments invalidate only the affected analysis, content, pricing, readiness checks, or approvals according to deterministic rules. Historical records remain immutable and auditable.
 
-- Never generate unsupported credentials, references, turnover, certifications, CV facts, prices, dates, or legal declarations.
-- Reject prompt injection found inside tender documents; documents are data, not instructions.
-- Tool calls use explicit allowlists and validated arguments.
-- External research cannot write directly into approved proposal content.
-- Detect and mark conflicts between source documents.
-- Require a second validation pass for mandatory requirements.
-- Present uncertainty and missing evidence visibly.
+## 7. Source strategy
 
-## 11. Security and privacy baseline
+### 7.1 TED
 
-### 11.1 Access control
+The official TED Search API v3 is the selected primary automated opportunity-discovery source for relevant published EU notices.
 
-Initial roles:
+Production endpoint:
 
-| Role | Capabilities |
+```text
+POST https://api.ted.europa.eu/v3/notices/search
+```
+
+The implementation must follow [`TED_DISCOVERY.md`](docs/integrations/TED_DISCOVERY.md), use durable cursor/replay behavior, preserve raw source versions, and validate configured query syntax and fields against the current production contract.
+
+### 7.2 RHR
+
+The selected MVP strategy is:
+
+1. use TED for documented automated discovery where notices are available there;
+2. support user-directed import of a known public RHR notice URL or identifier;
+3. support manual notice and document import as a first-class fallback;
+4. optionally retrieve explicitly public rendered RHR notice content through a bounded, allowlisted adapter;
+5. preserve raw source identity and immutable versions;
+6. do not implement undocumented bulk RHR search, sequential ID crawling, authenticated scraping, or supplier submission automation.
+
+The public rendered notice pattern observed during discovery is:
+
+```text
+https://riigihanked.riik.ee/rhr/api/public/v1/notice/{noticeId}/html
+```
+
+This observed path is not permission to assume an undocumented bulk-search API.
+
+### 7.3 Fixtures
+
+Offline source tests use:
+
+```text
+fixtures/rhr/
+fixtures/ted/
+```
+
+Read each fixture directory's `README.md` before using its data. Fixtures are test contracts, not live API schemas, production business data, or proof of current legal permission for a broader integration.
+
+## 8. Local-first architecture
+
+```mermaid
+flowchart LR
+    U[Local browser] --> W[Next.js web]
+    W --> A[FastAPI API]
+    A --> DB[(PostgreSQL + pgvector)]
+    A --> OBJ[(MinIO)]
+    A --> R[(Redis)]
+    A --> Q[Job queue]
+    Q --> WK[Python worker]
+    WK --> DOC[Parsing and OCR]
+    WK --> RHR[RHR adapter]
+    WK --> TED[TED adapter]
+    WK --> AI[AI provider adapter]
+    WK --> DB
+    WK --> OBJ
+```
+
+Expected implementation:
+
+| Area | Baseline |
 |---|---|
-| `ADMIN` | system configuration, users, source connections, policies, audit access |
-| `PROCUREMENT_MANAGER` | opportunity decisions, workspaces, assignments, export orchestration |
-| `AUTHOR` | analysis, research, drafting, evidence linking |
-| `REVIEWER` | review, request changes, approve assigned areas |
-| `COMMERCIAL_APPROVER` | approve pricing and commercial terms |
-| `AUTHORIZED_SUBMITTER` | approve final submission package and record submission |
-| `VIEWER` | read-only access to permitted workspaces |
+| Web | Next.js, React, TypeScript strict mode |
+| API | Python 3.12, FastAPI, Pydantic |
+| Worker | Celery or Dramatiq, selected through an ADR |
+| Database | PostgreSQL with pgvector |
+| Queue/cache | Redis |
+| Object storage | MinIO |
+| AI | Official Google Gen AI SDK behind an internal provider interface |
+| Parsing | Local PDF, DOCX, XLSX, HTML, XML, TXT, and image pipeline |
+| OCR | Tesseract with Estonian and English language packs |
+| Export | Versioned DOCX templates and controlled local PDF conversion |
+| Testing | Pytest, Vitest, Playwright, Testcontainers, fixture-based contracts |
+| Quality | Ruff, mypy, ESLint, Prettier |
 
-Do not use role names alone for critical checks. Implement policy checks for workspace access and separation of duties.
+Material technology changes require an ADR.
 
-### 11.2 Secrets
+## 9. Architecture invariants
 
-- `.env` is local and ignored by Git.
-- Commit `.env.example` with empty values only.
-- Support Docker secrets or mounted secret files for production-like use.
-- Never log API keys, passwords, session tokens, cookies, document access tokens, or authorization headers.
-- Rotate credentials without rebuilding images.
+- domain logic does not import FastAPI, SQLAlchemy, Google SDKs, Redis, MinIO, or source HTTP clients;
+- external systems use ports and adapters;
+- original files and raw source versions are immutable;
+- changed content creates a new version;
+- citations identify an immutable source version and location;
+- generated company claims require approved evidence or explicit unresolved status;
+- approvals identify an exact version and content hash;
+- source changes can invalidate dependent approvals without deleting history;
+- deadlines preserve original text, source timezone, parsed UTC value, and parsing confidence;
+- money uses decimal values with currency and VAT basis;
+- AI output cannot directly mutate approved business records;
+- external actions are permission-checked, validated, confirmed, and audited.
 
-### 11.3 File security
+## 10. AI and data policy
 
-- Verify MIME type using content, not only extension.
-- Enforce size, extension, and parser limits.
-- Use antivirus scanning where practical.
-- Extract files in isolated worker processes with resource limits.
-- Block active content and unsafe archive traversal.
-- Keep original, normalized, and generated files in separate buckets/prefixes.
-- Hash every file with SHA-256.
+The application runs locally, but Gemini is external processing.
 
-### 11.4 AI data policy
+Mandatory behavior:
 
-Each workspace and document must have a classification such as:
+- production free-tier use is prohibited by project policy;
+- production requires a dedicated Eventnexus-controlled paid project;
+- unknown classification means no external AI;
+- `RESTRICTED_NO_EXTERNAL_AI` is always local-only;
+- `CONFIDENTIAL` and `PERSONAL_DATA` are denied by default;
+- local parsing, OCR, chunking, retrieval, and deterministic checks occur before any external call;
+- only minimum permitted excerpts may be sent;
+- every invocation is policy-gated, schema-validated, cost-limited, and auditable;
+- prompts and model identifiers are versioned;
+- paid live APIs are mocked in default tests;
+- model output remains a draft or recommendation until human review.
 
-- `PUBLIC`
-- `INTERNAL`
-- `CONFIDENTIAL`
-- `PERSONAL_DATA`
-- `RESTRICTED_NO_EXTERNAL_AI`
+Initial pilot hard limits are defined in [`AI_COST_POLICY.md`](docs/security/AI_COST_POLICY.md), including per-call, workflow, workspace, daily, and monthly bounds.
 
-A policy engine decides whether content may be sent to Gemini, must be redacted, or must remain local. Default to deny external AI for unknown classification.
+## 11. Planned repository structure
 
-### 11.5 Audit
-
-Audit at least:
-
-- login and failed login;
-- permission changes;
-- source configuration changes;
-- imports and document versions;
-- AI invocations and external data transfers;
-- requirement edits;
-- evidence approvals;
-- pricing changes;
-- review decisions;
-- export creation;
-- package approval;
-- submission record creation;
-- deletion and retention actions.
-
-Audit records must be append-only from normal application flows.
-
-## 12. Local Docker deployment
-
-Expected baseline services:
-
-```text
-web
-api
-worker
-postgres
-redis
-minio
-minio-init
-ocr
-```
-
-Optional profiles:
-
-```text
-observability: prometheus, grafana, otel-collector
-security: clamav
-conversion: libreoffice
-mail: local SMTP test service
-```
-
-Networking rules:
-
-- expose only the web reverse proxy to the host by default;
-- do not expose PostgreSQL, Redis, or MinIO publicly;
-- use internal Docker networks;
-- use health checks and dependency readiness checks;
-- run containers as non-root where feasible;
-- use read-only filesystems and dropped Linux capabilities where feasible;
-- persist data in named volumes or explicitly configured host paths;
-- provide documented backup and restore commands.
-
-## 13. Planned repository structure
+The repository skeleton created by `S1-T01` must preserve the Phase 0 documentation and fixture paths while adding implementation directories.
 
 ```text
 .
 ├── README.md
 ├── AGENTS.md
 ├── TASKS.md
-├── LICENSE
-├── .env.example
-├── .gitignore
 ├── .editorconfig
-├── docker-compose.yml
-├── docker-compose.dev.yml
-├── Makefile
+├── .gitattributes
+├── .gitignore
+├── .env.example                 # added in S1-T10
+├── docker-compose.yml           # added in S1-T06
+├── docker-compose.dev.yml       # added in S1-T08
+├── Makefile                     # added in S1-T09
 ├── apps/
 │   ├── web/
 │   ├── api/
@@ -579,226 +322,99 @@ Networking rules:
 │   ├── drafting/
 │   └── review/
 ├── docs/
+│   ├── product/
+│   ├── integrations/
+│   ├── security/
+│   ├── procurement/
+│   ├── legal/
 │   ├── architecture/
 │   ├── adr/
 │   ├── api/
-│   ├── security/
-│   ├── procurement/
 │   └── runbooks/
+├── fixtures/
+│   ├── rhr/
+│   └── ted/
 ├── tests/
-│   ├── fixtures/
 │   ├── integration/
 │   ├── e2e/
-│   └── security/
+│   ├── security/
+│   └── generated-fixtures/
 └── scripts/
 ```
 
-## 14. Environment configuration
+No open-source license has been selected. Do not add a license or claim open-source permissions without an explicit owner decision.
 
-The final `.env.example` must document at least:
+## 12. Local development starting point
 
-```dotenv
-# Application
-APP_ENV=development
-APP_BASE_URL=http://localhost:3000
-APP_TIMEZONE=Europe/Tallinn
-APP_DEFAULT_LOCALE=et-EE
-APP_ENCRYPTION_KEY=
-
-# Authentication
-SESSION_SECRET=
-INITIAL_ADMIN_EMAIL=
-INITIAL_ADMIN_PASSWORD=
-
-# Database
-POSTGRES_DB=eventnexus_hanked
-POSTGRES_USER=eventnexus
-POSTGRES_PASSWORD=
-DATABASE_URL=postgresql+psycopg://eventnexus:change-me@postgres:5432/eventnexus_hanked
-
-# Redis
-REDIS_URL=redis://redis:6379/0
-
-# Object storage
-MINIO_ENDPOINT=minio:9000
-MINIO_ACCESS_KEY=
-MINIO_SECRET_KEY=
-MINIO_SECURE=false
-MINIO_BUCKET_ORIGINALS=tender-originals
-MINIO_BUCKET_GENERATED=tender-generated
-
-# Google Gemini
-GEMINI_API_KEY=
-GEMINI_CLASSIFIER_MODEL=
-GEMINI_ANALYSIS_MODEL=
-GEMINI_DRAFT_MODEL=
-GEMINI_REVIEW_MODEL=
-GEMINI_EMBEDDING_MODEL=
-AI_EXTERNAL_PROCESSING_ENABLED=false
-AI_LOG_PROMPT_CONTENT=false
-AI_MAX_DAILY_COST_EUR=
-
-# Procurement sources
-RHR_SOURCE_ENABLED=false
-RHR_BASE_URL=https://riigihanked.riik.ee
-TED_SOURCE_ENABLED=false
-TED_API_BASE_URL=https://api.ted.europa.eu
-
-# Files
-MAX_UPLOAD_SIZE_MB=100
-OCR_LANGUAGES=est+eng
-ANTIVIRUS_ENABLED=false
-
-# Notifications
-SMTP_HOST=
-SMTP_PORT=587
-SMTP_USERNAME=
-SMTP_PASSWORD=
-SMTP_FROM=
-
-# Observability
-LOG_LEVEL=INFO
-OTEL_ENABLED=false
-PROMETHEUS_ENABLED=false
-```
-
-Real values must never be committed.
-
-## 15. Development commands
-
-The repository must eventually expose consistent root commands:
+Clone the repository:
 
 ```bash
-make bootstrap
-make dev
-make stop
-make logs
-make lint
-make typecheck
-make test
-make test-integration
-make test-e2e
-make migrate
-make seed
-make backup
-make restore BACKUP=path/to/backup
+git clone https://github.com/pikkst/Eventnexus-hanke-keskond.git
+cd Eventnexus-hanke-keskond
 ```
 
-Equivalent Windows-friendly PowerShell commands or documented Docker commands must be provided.
+Before the first change:
 
-## 16. Testing strategy
+1. read `README.md`, `AGENTS.md`, and the active task in `TASKS.md`;
+2. read `docs/product/PHASE_0_READINESS_REVIEW.md`;
+3. select the canonical documents required by the task using the matrix in `AGENTS.md`;
+4. confirm that no real secrets, personal data, or tender documents are being added;
+5. start with `S1-T01 — Create repository skeleton`;
+6. use focused conventional commits and update `TASKS.md` only after acceptance criteria are verified.
 
-### Unit tests
+At the current repository state, commands such as `make test` or `docker compose up` do not exist yet. Do not interpret their absence as a failure; creating the foundation is the next phase.
 
-- domain rules;
-- scoring functions;
-- state transitions;
-- schema validation;
-- deadline calculations;
-- pricing calculations;
-- redaction and policy decisions;
-- source normalization;
-- prompt assembly without external calls.
+## 13. Planned root commands
 
-### Contract tests
+Later Phase 1 tasks will provide Windows-friendly and Bash-compatible entrypoints for:
 
-- Gemini adapter with recorded safe fixtures;
-- RHR adapter against approved snapshots;
-- TED API query and response fixtures;
-- document parser fixtures;
-- export schema and template tests.
+```text
+bootstrap
+dev
+stop
+logs
+format-check
+lint
+typecheck
+test
+integration
+e2e
+migrate
+seed
+backup
+restore
+```
 
-### Integration tests
+Destructive operations must require explicit confirmation.
 
-- PostgreSQL migrations;
-- object storage lifecycle;
-- job retries and dead-letter behavior;
-- import-to-workspace flow;
-- extraction-to-compliance flow;
-- approval invalidation after source change;
-- package generation and hash verification.
+## 14. Definition of MVP done
 
-### End-to-end tests
-
-- first admin setup;
-- create company profile;
-- import opportunity;
-- perform `GO/NO_GO` assessment;
-- create workspace;
-- upload and parse documents;
-- review requirements;
-- draft proposal;
-- approve package;
-- export and record submission.
-
-### AI evaluation
-
-Maintain a sanitized evaluation set with expected:
-
-- requirement recall;
-- mandatory-vs-optional classification;
-- citation correctness;
-- unsupported-claim rate;
-- language quality;
-- scoring stability;
-- prompt-injection resistance;
-- cost and latency.
-
-No AI feature is complete without measurable evaluation criteria.
-
-## 17. Definition of MVP done
-
-The MVP is complete only when:
+The MVP is not complete until:
 
 - a clean machine can start the system through documented Docker commands;
-- the application is usable in Estonian;
-- users and permissions are enforced;
-- at least one approved RHR ingestion method and the TED Search API adapter work;
-- source notices and document versions are preserved;
-- PDF and DOCX extraction work with citations;
-- opportunity scoring is explainable and configurable;
-- the compliance matrix covers mandatory requirements and evidence;
-- Gemini calls are schema-validated, audited, cost-limited, and policy-gated;
-- proposal drafts can be generated only from approved evidence and cited tender context;
-- review and approval gates block incomplete packages;
-- DOCX/PDF export and attachment manifests work;
-- final submission remains human-controlled;
+- the core UI is usable in Estonian;
+- authentication, authorization, and audit controls pass negative tests;
+- the approved RHR path, TED adapter, and manual import work;
+- source and document versions remain immutable and citeable;
+- parsing and OCR produce visible quality information;
+- matching and GO/NO-GO decisions are explainable and human-controlled;
+- requirements and the compliance matrix are reviewable and source-grounded;
+- Gemini use is policy-gated, schema-validated, cost-limited, and audited;
+- proposal drafts use approved evidence and expose assumptions;
+- pricing calculations are deterministic and human-approved;
+- readiness checks block incomplete or stale packages;
+- DOCX/PDF export, manifest, package hash, and checklist work;
+- submission remains human-controlled;
 - backup and restore are tested;
-- critical security tests pass;
-- all required documentation and runbooks exist.
+- security, AI-quality, and pilot gates pass;
+- required user, administrator, security, integration, and recovery documentation exists.
 
-## 18. Roadmap summary
+The detailed release gate is maintained in [`TASKS.md`](TASKS.md).
 
-### Phase 0 — Discovery and policy
+## 15. Legal and operational notice
 
-Validate RHR integration options, Gemini data policy, user roles, document classifications, legal boundaries, and the first real pilot tender.
+This repository does not provide legal advice. Procurement requirements, laws, official notices, source interfaces, deadlines, data-processing terms, and submission rules are time-sensitive and must be rechecked against current official sources before production use.
 
-### Phase 1 — Platform foundation
+## 16. License
 
-Build the monorepo, Docker environment, authentication, database, storage, job processing, and audit system.
-
-### Phase 2 — Discovery and ingestion
-
-Implement RHR/TED adapters, manual import, document extraction, version tracking, and opportunity matching.
-
-### Phase 3 — Tender intelligence
-
-Implement requirement extraction, compliance matrix, research, evidence management, and clarification workflows.
-
-### Phase 4 — Proposal production
-
-Implement approved content blocks, structured drafting, pricing scenarios, templates, review, approval, and export.
-
-### Phase 5 — Pilot hardening
-
-Run real tender pilots, measure extraction quality, harden security, test backup/restore, and improve usability.
-
-Detailed implementation work is maintained in [`TASKS.md`](TASKS.md). Coding-agent behavior and architecture constraints are maintained in [`AGENTS.md`](AGENTS.md).
-
-## 19. Legal and operational notice
-
-This repository does not provide legal advice. Procurement requirements, official notices, deadlines, submission rules, and applicable laws must be checked against current official sources. The authorized user remains responsible for the final offer and submission.
-
-## 20. License
-
-No open-source license has been selected yet. Until a license is added, all rights are reserved by the repository owner and Eventnexus OÜ as applicable.
+No open-source license has been selected. Until an explicit license is added, do not assume permission to copy, redistribute, sublicense, or commercially reuse the repository contents beyond the repository owner's authorization.
