@@ -362,7 +362,7 @@ Before the first change:
 5. start with `S1-T01 — Create repository skeleton`;
 6. use focused conventional commits and update `TASKS.md` only after acceptance criteria are verified.
 
-At the current repository state, commands such as `make test` or `docker compose up` do not exist yet. Do not interpret their absence as a failure; creating the foundation is the next phase.
+At the current repository state, commands such as `make test` do not exist yet. Use `docker compose up --build` for the base stack or `docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build` for development mode with hot reload. See `docs/runbooks/DEVELOPMENT.md` for shell-specific instructions.
 
 ## 13. Planned root commands
 
