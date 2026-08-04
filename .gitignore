@@ -46,6 +46,9 @@ obj/
 Thumbs.db
 desktop.ini
 
+# Tool runtime directories
+.saydeploy/
+
 # IDE
 .idea/
 .vscode/

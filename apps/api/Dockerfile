@@ -1,4 +1,4 @@
-FROM python:3.12-slim AS base
+FROM python:3.12.8-slim-bookworm AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
@@ -12,12 +12,12 @@ FROM base AS deps
 COPY pyproject.toml ./
 COPY app ./app
 RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --no-cache-dir .
+    /opt/venv/bin/pip install --no-cache-dir . && \
+    rm -rf /root/.cache
 
 FROM base AS runtime
 COPY --from=deps /opt/venv /opt/venv
 COPY app ./app
-COPY .env.example ./.env.example
 
 RUN chown -R eventnexus:eventnexus /app
 USER eventnexus
