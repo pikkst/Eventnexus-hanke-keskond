@@ -1,0 +1,169 @@
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    environment:
+      - APP_ENV=development
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - DATABASE_URL=postgresql+asyncpg://eventnexus:eventnexus@postgres:5432/eventnexus
+      - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - LOG_LEVEL=info
+      - LOG_FORMAT=console
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  worker:
+    build:
+      context: ./apps/worker
+      dockerfile: Dockerfile
+    environment:
+      - APP_ENV=development
+      - WORKER_REDIS_HOST=redis
+      - WORKER_REDIS_PORT=6379
+      - WORKER_REDIS_DB=0
+      - WORKER_REDIS_PASSWORD=
+      - WORKER_THREADS=2
+      - WORKER_MAX_RETRIES=3
+      - WORKER_TASK_TIMEOUT=60000
+      - WORKER_DEAD_LETTER_QUEUE=dead_letter
+      - LOG_LEVEL=info
+      - LOG_FORMAT=json
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8001/health', timeout=5).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=eventnexus
+      - POSTGRES_PASSWORD=eventnexus
+      - POSTGRES_DB=eventnexus
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eventnexus -d eventnexus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  minio:
+    image: minio/minio:latest
+    environment:
+      - MINIO_ROOT_USER=eventnexus
+      - MINIO_ROOT_PASSWORD=eventnexus
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    networks:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  db-init:
+    image: postgres:16-alpine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./infrastructure/docker/init-db/01-create-extension.sql:/tmp/init.sql:ro
+    environment:
+      - PGPASSWORD=eventnexus
+    command: sh -c "until pg_isready -h postgres -U eventnexus -d eventnexus; do sleep 1; done; psql -h postgres -U eventnexus -d eventnexus -f /tmp/init.sql"
+    networks:
+      - backend
+    restart: "no"
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    volumes:
+      - ./infrastructure/docker/init-minio/init.sh:/tmp/init.sh:ro
+    environment:
+      - MINIO_ROOT_USER=eventnexus
+      - MINIO_ROOT_PASSWORD=eventnexus
+    command: sh -c "chmod +x /tmp/init.sh; /tmp/init.sh"
+    networks:
+      - backend
+    restart: "no"
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:

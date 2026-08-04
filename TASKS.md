@@ -240,7 +240,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 1.2 — Docker development environment
 
-- [ ] **S1-T06 — Create base Docker Compose stack**
+- [~] **S1-T06 — Create base Docker Compose stack**
   - Add `web`, `api`, `worker`, `postgres`, `redis`, `minio`, and initialization services.
   - Use health checks, internal networks, named volumes, and restart policies appropriate for development.
   - Acceptance:
