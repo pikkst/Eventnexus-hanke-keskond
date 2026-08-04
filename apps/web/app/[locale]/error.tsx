@@ -3,7 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useEffect } from 'react';
 
-export default function GlobalError({
+export default function LocaleError({
   error,
   reset,
 }: {
@@ -17,13 +17,10 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html>
-      <head />
-      <body>
-        <h2>{t('title')}</h2>
-        <p>{t('description')}</p>
-        <button onClick={() => reset()}>{t('retry')}</button>
-      </body>
-    </html>
+    <section>
+      <h2>{t('title')}</h2>
+      <p>{t('description')}</p>
+      <button onClick={() => reset()}>{t('retry')}</button>
+    </section>
   );
 }

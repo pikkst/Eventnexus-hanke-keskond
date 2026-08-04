@@ -9,8 +9,11 @@ vi.mock('next/navigation', () => ({
     replace: vi.fn(),
     push: vi.fn(),
     refresh: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
   }),
   usePathname: () => '/',
+  useSearchParams: () => null,
   redirect: vi.fn(),
   permanentRedirect: vi.fn(),
 }));
