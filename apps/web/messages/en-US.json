@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "title": "Eventnexus Tender Workspace",
+    "description": "Local procurement intelligence and tender preparation system"
+  },
+  "common": {
+    "appName": "Eventnexus",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "language": "Language",
+    "navigation": {
+      "home": "Home",
+      "opportunities": "Opportunities",
+      "about": "About"
+    }
+  },
+  "home": {
+    "title": "Welcome to Eventnexus",
+    "subtitle": "Local Estonian and EU procurement discovery",
+    "cta": {
+      "primary": "Start searching",
+      "secondary": "View instructions"
+    }
+  },
+  "header": {
+    "logo": "Eventnexus",
+    "menu": {
+      "home": "Home",
+      "about": "About"
+    }
+  },
+  "languageSwitcher": {
+    "label": "Select language",
+    "et": "Estonian",
+    "en": "English"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "description": "The page could not be loaded.",
+    "retry": "Retry"
+  },
+  "health": {
+    "title": "Health Check",
+    "status": {
+      "ok": "All systems operational",
+      "error": "Issue detected"
+    }
+  }
+}
