@@ -1,0 +1,49 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "system": "RHR",
+    "url": "https://riigihanked.riik.ee/rhr/api/public/v1/notice/4012336/html",
+    "notice_id": "4012336",
+    "retrieved_at": "2026-08-04T00:00:00Z",
+    "capture_type": "sanitized_public_notice_projection",
+    "schema_note": "EventNexus fixture contract, not an official RHR JSON schema"
+  },
+  "notice": {
+    "country": "EE",
+    "form_family": "result",
+    "notice_type": "contract_award_notice",
+    "title": "Trembita 2.0 modernization",
+    "procedure_id": "c7a876f8-1964-43ab-8c7d-0af72b13beb5",
+    "procedure_reference": "267020",
+    "main_cpv": "72200000",
+    "lots": [
+      {
+        "lot_id": "LOT-0000",
+        "title": "Trembita 2.0 modernization",
+        "award_status": "winner_selected",
+        "result_value": {
+          "amount": "1499970.00",
+          "currency": "EUR"
+        },
+        "offers_received": 1,
+        "subcontracting": false
+      }
+    ],
+    "contract": {
+      "contract_reference": "2-11/399-2023",
+      "signed_date_original": "2023-11-01+02:00",
+      "framework_contract": false
+    },
+    "winner": {
+      "organization_name": "Cybernetica AS",
+      "natural_person_data_removed": true
+    }
+  },
+  "expected": {
+    "is_it_procurement": true,
+    "maps_to_outcome": "AWARDED",
+    "preserve_result_value_as_decimal": true,
+    "preserve_original_date_and_timezone": true,
+    "do_not_infer_eventnexus_participation": true
+  }
+}
