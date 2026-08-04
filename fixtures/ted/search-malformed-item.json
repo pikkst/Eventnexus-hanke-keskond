@@ -1,0 +1,33 @@
+{
+  "fixture_version": 1,
+  "response": {
+    "totalNoticeCount": 2,
+    "iterationNextToken": null,
+    "notices": [
+      {
+        "publication-number": "100004-2026",
+        "notice-identifier": "fixture-valid-004",
+        "notice-version": "01",
+        "publication-date": "2026-08-02",
+        "notice-title": {"EST": "Kehtiv näidisteade"},
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72200000"]
+      },
+      {
+        "publication-number": null,
+        "notice-identifier": "",
+        "notice-version": "unexpected-array-value",
+        "publication-date": "not-a-date",
+        "notice-title": 42,
+        "classification-cpv": [null, "invalid"]
+      }
+    ]
+  },
+  "expected": {
+    "valid_items_imported": 1,
+    "invalid_items_quarantined": 1,
+    "page_not_silently_accepted": true,
+    "raw_response_retained": true,
+    "durable_cursor_behavior": "advance only according to documented partial-page transaction policy"
+  }
+}
