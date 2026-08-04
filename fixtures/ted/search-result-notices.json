@@ -1,0 +1,68 @@
+{
+  "fixture_version": 1,
+  "fixture_kind": "synthetic_documentation_derived_search_response",
+  "schema_note": "EventNexus fixture contract derived from TED Search API concepts; not an official TED response snapshot",
+  "response": {
+    "totalNoticeCount": 2,
+    "iterationNextToken": null,
+    "notices": [
+      {
+        "publication-number": "100005-2026",
+        "notice-identifier": "fixture-estonia-it-result-awarded-001",
+        "notice-version": "01",
+        "publication-date": "2026-08-03",
+        "notice-title": {
+          "EST": "Infosüsteemi arendusteenuse lepingu sõlmimise teade",
+          "ENG": "Information system development contract award notice"
+        },
+        "notice-type": "contract-award-result",
+        "procedure-identifier": "fixture-procedure-result-001",
+        "buyer-name": {"EST": ["Näidisamet"]},
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72200000"],
+        "official-language": ["EST", "ENG"],
+        "lots": [
+          {
+            "id": "LOT-0000",
+            "winner-selected": true,
+            "result-value": {"amount": "450000.00", "currency": "EUR"},
+            "offers-received": 3
+          }
+        ]
+      },
+      {
+        "publication-number": "100006-2026",
+        "notice-identifier": "fixture-estonia-it-result-no-award-001",
+        "notice-version": "01",
+        "publication-date": "2026-08-03",
+        "notice-title": {
+          "EST": "Pilveteenuse nõustamise hanke lõpetamise teade",
+          "ENG": "Cloud advisory procurement termination notice"
+        },
+        "notice-type": "contract-award-result",
+        "procedure-identifier": "fixture-procedure-result-002",
+        "buyer-name": {"ENG": ["Example Public Authority"]},
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72222000"],
+        "official-language": ["ENG"],
+        "lots": [
+          {
+            "id": "LOT-0000",
+            "winner-selected": false,
+            "outcome": "terminated-without-award",
+            "termination-reason": "no-tenders-received"
+          }
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "notice_count": 2,
+    "awarded_outcome_count": 1,
+    "terminated_without_award_count": 1,
+    "do_not_infer_eventnexus_participation": true,
+    "winner_selected_controls_award_mapping": true,
+    "termination_requires_explicit_result_semantics": true,
+    "preserve_result_values_as_decimal": true
+  }
+}
