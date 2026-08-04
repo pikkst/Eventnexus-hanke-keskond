@@ -75,6 +75,8 @@ MailHog captures all emails sent by the application during development.
 
 Configure application mail settings to use `mailhog:1025` as the SMTP host when running inside Docker, or `localhost:1025` when sending from the host machine directly.
 
+> **Note:** MailHog does not publish semantic version tags on Docker Hub. The compose override uses `latest`. If stricter reproducibility is required, pin by image digest instead of tag.
+
 ## Hot reload behavior
 
 | Service | Mount | Reload mechanism |
