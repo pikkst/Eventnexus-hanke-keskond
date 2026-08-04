@@ -43,7 +43,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 0.1 — Product definition
 
-- [ ] **S0-T01 — Write the product requirements document**
+- [x] **S0-T01 — Write the product requirements document**
   - Create `docs/product/PRODUCT_REQUIREMENTS.md`.
   - Define users, jobs-to-be-done, pain points, success metrics, core workflows, non-goals, and MVP boundaries.
   - Define Estonian-first language requirements and English tender handling.
@@ -53,7 +53,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - autonomous submission is explicitly excluded;
     - measurable pilot success criteria exist.
 
-- [ ] **S0-T02 — Define Eventnexus OÜ company profile requirements**
+- [x] **S0-T02 — Define Eventnexus OÜ company profile requirements**
   - Document the fields needed for capabilities, technologies, industries, references, staff, certifications, finances, partners, exclusions, CPV interests, capacity, and risk appetite.
   - Identify which fields are facts, evidence, preferences, or derived scores.
   - Acceptance:
