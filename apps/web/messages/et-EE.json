@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "Eventnexus Hanke Keskond",
-    "description": "Kohalik eskiimine ja turundusagentuur"
+    "description": "Kohalik soetamise intellientsus ja pakkumise ettevalmistussüsteem"
   },
   "common": {
     "appName": "Eventnexus",
@@ -9,7 +9,7 @@
     "cancel": "Tühista",
     "close": "Sulge",
     "confirm": "Kinnita",
-    "loading": "Laadimine...",
+    "loading": "Laadimine…",
     "error": "Tekkis viga",
     "language": "Keel",
     "navigation": {
@@ -20,7 +20,7 @@
   },
   "home": {
     "title": "Tere tulemast Eventnexusse",
-    "subtitle": "Kohalik Eesti ja EU riigihanked",
+    "subtitle": "Kohalikud Eesti ja EL-i riigihanked",
     "cta": {
       "primary": "Alusta otsingut",
       "secondary": "Vaata juhiseid"
@@ -39,15 +39,15 @@
     "en": "Inglise"
   },
   "error": {
-    "title": "Midagi läks valesti",
-    "description": "Lehekült ei suudanud laadida.",
-    "retry": "Pööra"
+    "title": "Midagi läks katki",
+    "description": "Lehekülge ei õnnestunud laadida.",
+    "retry": "Proovi uuesti"
   },
   "health": {
-    "title": "Tervisetuvitus",
+    "title": "Tervisekontroll",
     "status": {
-      "ok": "Kõik hästi",
-      "error": "Viga tuvastatud"
+      "ok": "Kõik näitajad on tervislikud",
+      "error": "Avastati probleem"
     }
   }
 }

@@ -9,7 +9,7 @@
     "cancel": "Cancel",
     "close": "Close",
     "confirm": "Confirm",
-    "loading": "Loading...",
+    "loading": "Loading…",
     "error": "An error occurred",
     "language": "Language",
     "navigation": {
@@ -20,7 +20,7 @@
   },
   "home": {
     "title": "Welcome to Eventnexus",
-    "subtitle": "Local Estonian and EU procurement discovery",
+    "subtitle": "Local Estonian and EU procurements",
     "cta": {
       "primary": "Start searching",
       "secondary": "View instructions"
@@ -47,7 +47,7 @@
     "title": "Health Check",
     "status": {
       "ok": "All systems operational",
-      "error": "Issue detected"
+      "error": "An issue was detected"
     }
   }
 }
