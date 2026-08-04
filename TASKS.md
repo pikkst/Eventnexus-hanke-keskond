@@ -61,7 +61,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - sensitive fields have classification guidance;
     - required MVP fields are separated from optional fields.
 
-- [ ] **S0-T03 — Define the MVP tender lifecycle**
+- [x] **S0-T03 — Define the MVP tender lifecycle**
   - Document states, transitions, permissions, validation gates, invalidation rules, and terminal states.
   - Include amendment, clarification, cancellation, withdrawal, submitted, awarded, and not-awarded paths.
   - Acceptance:
@@ -70,7 +70,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - source changes invalidate affected analysis and approvals;
     - no transition depends only on model output.
 
-- [ ] **S0-T04 — Define pilot success metrics**
+- [x] **S0-T04 — Define pilot success metrics**
   - Define measurable targets for opportunity recall, false-positive rate, requirement recall, citation accuracy, unsupported-claim rate, preparation time reduction, user review time, export correctness, and system reliability.
   - Acceptance:
     - metrics have calculation methods;
@@ -79,7 +79,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 0.2 — RHR and TED integration discovery
 
-- [ ] **S0-T05 — RHR official integration discovery spike**
+- [x] **S0-T05 — RHR official integration discovery spike**
   - Investigate official RHR open data, documented APIs, public notice endpoints, export formats, authentication, rate limits, update/version semantics, and reuse conditions.
   - Contact official support if documentation is incomplete.
   - Record exact official sources and retrieval date.
@@ -91,7 +91,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - no production scraper is created during the spike;
     - an ADR selects the initial RHR strategy.
 
-- [ ] **S0-T06 — Capture sanitized RHR fixtures**
+- [x] **S0-T06 — Capture sanitized RHR fixtures**
   - Save representative public notice payloads or exports for IT procurements, lots, amendments, cancellations, award notices, and attachments.
   - Remove unnecessary personal details when possible.
   - Acceptance:
@@ -100,7 +100,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - fixture license/reuse status is documented;
     - tests can run without live RHR access.
 
-- [ ] **S0-T07 — TED API discovery spike**
+- [x] **S0-T07 — TED API discovery spike**
   - Validate TED API 3 Search API, query syntax, pagination/iteration, eForms identifiers, multilingual fields, downloadable formats, and limits.
   - Create `docs/integrations/TED_DISCOVERY.md`.
   - Acceptance:
@@ -109,7 +109,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - pagination and replay strategy are documented;
     - sanitized fixtures are stored.
 
-- [ ] **S0-T08 — Decide source freshness and synchronization policy**
+- [x] **S0-T08 — Decide source freshness and synchronization policy**
   - Define polling intervals, manual refresh, backoff, source outage behavior, amendment urgency, retention, and cursor recovery.
   - Acceptance:
     - no source is polled more aggressively than permitted;
@@ -119,7 +119,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 0.3 — AI data governance
 
-- [ ] **S0-T09 — Gemini account and data-processing decision**
+- [x] **S0-T09 — Gemini account and data-processing decision**
   - Decide which Google account/project, billing tier, contractual terms, API region constraints, and organizational controls are approved for production data.
   - Record whether zero-data-retention-compatible usage is required and which API features are allowed.
   - Create `docs/security/GEMINI_DATA_POLICY.md`.
@@ -129,7 +129,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - file upload, caching, logging, and grounding features are individually addressed;
     - responsible owner and review date are recorded.
 
-- [ ] **S0-T10 — Define document classification policy**
+- [x] **S0-T10 — Define document classification policy**
   - Define `PUBLIC`, `INTERNAL`, `CONFIDENTIAL`, `PERSONAL_DATA`, and `RESTRICTED_NO_EXTERNAL_AI`.
   - Define defaults, user overrides, redaction requirements, retention, and external-AI permissions.
   - Acceptance:
@@ -137,7 +137,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - every class has allowed processing paths;
     - policy covers derived chunks, embeddings, prompts, responses, exports, and logs.
 
-- [ ] **S0-T11 — Create AI threat model**
+- [x] **S0-T11 — Create AI threat model**
   - Cover prompt injection, data exfiltration, malicious attachments, unsupported claims, model hallucination, tool abuse, denial-of-wallet, sensitive logging, stale evidence, and provider outage.
   - Create `docs/security/AI_THREAT_MODEL.md`.
   - Acceptance:
@@ -145,7 +145,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - residual risks are explicit;
     - tool allowlisting and schema validation are mandatory controls.
 
-- [ ] **S0-T12 — Define AI cost policy**
+- [x] **S0-T12 — Define AI cost policy**
   - Define per-call, per-workspace, daily, monthly, and emergency-stop limits.
   - Define cost visibility and approval for unusually large jobs.
   - Acceptance:
@@ -155,7 +155,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 0.4 — Submission, signing, and legal boundaries
 
-- [ ] **S0-T13 — Document MVP submission policy**
+- [x] **S0-T13 — Document MVP submission policy**
   - Create `docs/procurement/SUBMISSION_POLICY.md`.
   - Specify that the MVP produces a package and checklist while the authorized person submits through the official channel.
   - Acceptance:
@@ -163,7 +163,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - submission evidence fields are defined;
     - responsibilities before and after submission are explicit.
 
-- [ ] **S0-T14 — Investigate official submission integration options**
+- [x] **S0-T14 — Investigate official submission integration options**
   - Determine whether any official RHR interface supports supplier-side draft or submission automation.
   - Document legal, authentication, technical, and support constraints.
   - Acceptance:
@@ -171,7 +171,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - result is a documented `supported`, `unsupported`, or `unknown` conclusion;
     - any future work is placed in post-MVP tasks.
 
-- [ ] **S0-T15 — Define legal disclaimer and review checkpoints**
+- [x] **S0-T15 — Define legal disclaimer and review checkpoints**
   - Define where legal, procurement, privacy, security, commercial, and authorized-signatory review are required.
   - Acceptance:
     - the UI and exports can display correct responsibility notices;
@@ -186,7 +186,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 - [ ] Gemini data policy approved.
 - [ ] Document classifications approved.
 - [ ] Submission boundary approved.
-- [ ] Pilot success metrics defined.
+- [x] Pilot success metrics defined.
 
 ---
 
