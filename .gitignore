@@ -1,0 +1,66 @@
+# Secrets and credentials
+.env
+.env.*
+!.env.example
+secrets/
+credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Volumes and persistent data (root-anchored to avoid hiding source dirs like apps/api/db/)
+/volumes/
+/data/
+/db/
+/postgres/
+/redis/
+/minio/
+
+# Uploads and user-generated files (root-anchored)
+/uploads/
+/tmp/
+/temp/
+/cache/
+
+# Generated files (root-anchored for project root, any-depth for app/package outputs)
+/generated/
+*.generated.*
+*.min.js
+*.min.css
+coverage/
+dist/
+build/
+out/
+bin/
+obj/
+.next/
+
+# Local tender data directory (root-anchored)
+/local-tender-data/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
