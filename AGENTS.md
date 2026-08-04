@@ -9,6 +9,7 @@ Build a secure, local-first, Docker-based procurement intelligence and tender pr
 The system must help people:
 
 - discover relevant Estonian and EU IT procurements;
+- identify realistic direct bids, partner opportunities, growth targets, and no-go cases for the company's current verified maturity;
 - understand tender documents and requirements;
 - perform traceable research;
 - create evidence-backed proposal content;
@@ -17,6 +18,23 @@ The system must help people:
 - retain a complete audit trail.
 
 The system must not remove human accountability. An authorized person approves final claims, declarations, pricing, attachments, signatures, and submission.
+
+### 1.1 STARTER-first priority
+
+The first product mode is governed by [`docs/product/STARTER_MODE.md`](docs/product/STARTER_MODE.md).
+
+For company onboarding, opportunity ranking, matching, GO/NO-GO, capacity, hard blockers, partner analysis, partner outreach, growth recommendations, or related UI, read that document completely before planning or coding.
+
+Non-negotiable STARTER rules:
+
+- Eventnexus OÜ exists, while the initial product-owner baseline of `0 EUR` turnover and one available worker remains user-confirmed data pending normal evidence verification;
+- references, partners, certifications, finances, additional people, and delivery capacity remain unknown until supported by approved evidence;
+- deterministic hard blockers run before weighted fit scores;
+- direct fit and partner fit are separate;
+- every analyzed opportunity must support `DIRECT_BID`, `PARTNER_OPPORTUNITY`, `GROWTH_TARGET`, or `NO_GO` as an explainable analysis classification;
+- STARTER classifications do not replace the authorized human lifecycle decision;
+- a low contract value must never be treated as proof that an opportunity is low-barrier;
+- the first useful vertical slice is onboarding → manual tender import → eligibility comparison → hard-blocker review → STARTER classification → partner brief or growth action → human feedback.
 
 ## 2. Instruction precedence
 
@@ -53,6 +71,7 @@ Do not implement from `TASKS.md` alone when a canonical document exists for the 
 | File | Canonical responsibility | Read before |
 |---|---|---|
 | [`docs/product/PRODUCT_REQUIREMENTS.md`](docs/product/PRODUCT_REQUIREMENTS.md) | Users, jobs-to-be-done, user outcomes, MVP boundaries, Estonian-first requirements, English tender handling, and product success criteria. | Any user-facing feature, scope decision, workflow, localization, analytics, or MVP trade-off. |
+| [`docs/product/STARTER_MODE.md`](docs/product/STARTER_MODE.md) | STARTER maturity, evidence-aware onboarding, low-barrier rules, deterministic hard blockers, direct/partner fit, four-way opportunity classification, partner brief, growth roadmap, first usable vertical slice, and STARTER metrics. | Company onboarding, matching, GO/NO-GO, capacity, opportunity ranking, partner analysis, outreach, growth recommendations, or STARTER UI. |
 | [`docs/product/COMPANY_PROFILE_REQUIREMENTS.md`](docs/product/COMPANY_PROFILE_REQUIREMENTS.md) | Eventnexus OÜ profile fields, facts/evidence/preferences/derived values, verification, validity, sensitivity, permissions, and required versus optional fields. | Company profile, evidence library, matching, references, staff, certifications, finances, partners, capacity, exclusions, or reusable content. |
 | [`docs/product/TENDER_LIFECYCLE.md`](docs/product/TENDER_LIFECYCLE.md) | Opportunity and tender-workspace states, transitions, terminal states, role permissions, validation gates, and invalidation rules. | Any status field, workflow transition, amendment handling, GO/NO-GO, review, approval, export, submission record, or outcome flow. |
 | [`docs/product/PILOT_SUCCESS_METRICS.md`](docs/product/PILOT_SUCCESS_METRICS.md) | Metric definitions, formulas, targets, baselines, sampling, and later evaluation-task mapping. | Analytics, telemetry, AI evaluation, pilot reports, performance targets, quality gates, or release criteria. |
@@ -96,6 +115,7 @@ Do not implement from `TASKS.md` alone when a canonical document exists for the 
 | [`fixtures/ted/README.md`](fixtures/ted/README.md) | Provenance, scope, sanitization, and permitted use of TED fixtures. Read before using any `fixtures/ted/*.json`. |
 | `fixtures/ted/search-estonia-it-page-1.json` | Initial TED search page, field mapping, and pagination tests. |
 | `fixtures/ted/search-estonia-it-page-2-change.json` | Continuation/replay and changed-notice tests. |
+| `fixtures/ted/search-result-notices.json` | Awarded and terminated-without-award result mapping tests. |
 | `fixtures/ted/search-malformed-item.json` | Validation, quarantine, partial-failure, and safe-degradation tests. |
 
 Fixtures are sanitized test contracts. They are not proof of current production API behavior, complete national coverage, legal permission for a new integration pattern, or Eventnexus OÜ business facts. Revalidate official interfaces before enabling live production access.
@@ -107,15 +127,16 @@ Before implementation, create a documentation dependency set and record it in th
 | Task area | Minimum required documents |
 |---|---|
 | Repository/bootstrap/architecture | `README.md`, `TASKS.md`, `PHASE_0_READINESS_REVIEW.md`, applicable ADRs |
-| Company profile/evidence/matching | `PRODUCT_REQUIREMENTS.md`, `COMPANY_PROFILE_REQUIREMENTS.md`, `DOCUMENT_CLASSIFICATION_POLICY.md`, `AI_THREAT_MODEL.md` |
-| Opportunity lifecycle/workspaces/approvals | `PRODUCT_REQUIREMENTS.md`, `TENDER_LIFECYCLE.md`, `SUBMISSION_POLICY.md`, `LEGAL_REVIEW_CHECKPOINTS.md` |
+| STARTER onboarding/matching/partner/growth | `STARTER_MODE.md`, `PRODUCT_REQUIREMENTS.md`, `COMPANY_PROFILE_REQUIREMENTS.md`, `PILOT_SUCCESS_METRICS.md`, `DOCUMENT_CLASSIFICATION_POLICY.md`, `AI_THREAT_MODEL.md` |
+| Company profile/evidence/matching | `STARTER_MODE.md`, `PRODUCT_REQUIREMENTS.md`, `COMPANY_PROFILE_REQUIREMENTS.md`, `DOCUMENT_CLASSIFICATION_POLICY.md`, `AI_THREAT_MODEL.md` |
+| Opportunity lifecycle/workspaces/approvals | `STARTER_MODE.md` when classification or participation analysis is involved, `PRODUCT_REQUIREMENTS.md`, `TENDER_LIFECYCLE.md`, `SUBMISSION_POLICY.md`, `LEGAL_REVIEW_CHECKPOINTS.md` |
 | RHR ingestion | `RHR_DISCOVERY.md`, ADR-001, `SOURCE_FRESHNESS_POLICY.md`, RHR fixture README and relevant fixtures |
 | TED ingestion | `TED_DISCOVERY.md`, `SOURCE_FRESHNESS_POLICY.md`, TED fixture README and relevant fixtures |
 | Documents/OCR/retrieval | `DOCUMENT_CLASSIFICATION_POLICY.md`, `AI_THREAT_MODEL.md`, company-profile evidence rules where company data is involved |
 | Gemini/embeddings/AI jobs | `GEMINI_DATA_POLICY.md`, `DOCUMENT_CLASSIFICATION_POLICY.md`, `AI_THREAT_MODEL.md`, `AI_COST_POLICY.md`, `PILOT_SUCCESS_METRICS.md` |
-| Proposal/pricing/review/export | `PRODUCT_REQUIREMENTS.md`, `TENDER_LIFECYCLE.md`, `COMPANY_PROFILE_REQUIREMENTS.md`, `SUBMISSION_POLICY.md`, `LEGAL_REVIEW_CHECKPOINTS.md` |
+| Proposal/pricing/review/export | `STARTER_MODE.md` for participation context, `PRODUCT_REQUIREMENTS.md`, `TENDER_LIFECYCLE.md`, `COMPANY_PROFILE_REQUIREMENTS.md`, `SUBMISSION_POLICY.md`, `LEGAL_REVIEW_CHECKPOINTS.md` |
 | Submission or signing-related work | `SUBMISSION_POLICY.md`, `RHR_SUBMISSION_INTEGRATION_DISCOVERY.md`, `LEGAL_REVIEW_CHECKPOINTS.md`, `TENDER_LIFECYCLE.md` |
-| Metrics/evaluations/pilot/release | `PILOT_SUCCESS_METRICS.md`, `PHASE_0_READINESS_REVIEW.md`, `AI_THREAT_MODEL.md`, and applicable source/product documents |
+| Metrics/evaluations/pilot/release | `STARTER_MODE.md`, `PILOT_SUCCESS_METRICS.md`, `PHASE_0_READINESS_REVIEW.md`, `AI_THREAT_MODEL.md`, and applicable source/product documents |
 
 If a task spans multiple areas, read the union of the required sets. Do not rely on another agent's summary when the canonical file is available.
 
@@ -126,10 +147,11 @@ If a task spans multiple areas, read the union of the required sets. Do not rely
 - Preserve the distinction between a completed research task and an organizationally approved milestone gate.
 - Do not mark an M0 approval complete merely because its document exists or its S0 task is complete.
 - Treat `docs/product/PHASE_0_READINESS_REVIEW.md` as the current record of open approvals and deferred decisions.
+- Treat `docs/product/STARTER_MODE.md` as the current product-priority addendum for onboarding, matching, partner, and growth work.
 - When code and a canonical document conflict, stop, record the conflict, and resolve it through explicit user direction or an ADR.
 - When changing governed behavior, update the canonical document in the same task or explicitly record why no documentation update is needed.
 - When renaming, moving, superseding, or adding a canonical file, update this map and all repository links in the same commit.
-- Do not invent a missing policy, API contract, approval, company fact, or official integration capability.
+- Do not invent a missing policy, API contract, approval, company fact, partner commitment, or official integration capability.
 - External URLs in research documents describe the research-date baseline, not a permanent contract. Re-check official sources before production enablement or a material integration change.
 - Future documents named only in `TASKS.md` are not authoritative until created and reviewed.
 
@@ -189,7 +211,7 @@ Rules:
 
 ## 8. Task execution policy
 
-`TASKS.md` is the delivery backlog and dependency map.
+`TASKS.md` is the delivery backlog and dependency map. `STARTER_MODE.md` defines the cross-phase STARTER workstream and its dependencies until each implementation slice is mapped into the active phase backlog.
 
 - Work in dependency order unless explicitly reprioritized.
 - A `SPIKE` produces documented findings and a decision, not speculative production code.
@@ -199,6 +221,7 @@ Rules:
 - When a task reveals new required work, add a scoped task with dependency and acceptance criteria.
 - Do not delete unfinished tasks to make progress appear complete.
 - Phase 0 research tasks are complete, but M0 organizational approvals remain separate gates as recorded in `PHASE_0_READINESS_REVIEW.md` and `TASKS.md`.
+- Do not start `ST-T02` through `ST-T05` before their documented platform, persistence, evidence, opportunity, and requirement dependencies exist.
 
 ## 9. Architecture constraints
 
@@ -288,6 +311,11 @@ Never call external APIs directly from controllers, UI components, or domain ent
 - Deduplication is explainable and reversible.
 - Deadlines preserve original text, timezone, parsed UTC value, and parsing confidence.
 - Source amendments invalidate affected stale analysis.
+- STARTER classifications are versioned analysis results, not lifecycle transitions.
+- Known deterministic hard blockers are evaluated before weighted fit scores.
+- `DIRECT_BID` is prohibited while a known unresolved uncoverable hard blocker exists.
+- Direct fit and partner fit are stored and explained separately.
+- A framework maximum value is not expected revenue.
 
 ### Requirements
 
@@ -300,9 +328,11 @@ Never call external APIs directly from controllers, UI components, or domain ent
 ### Claims and evidence
 
 - Every Eventnexus OÜ claim links to approved evidence.
-- AI cannot invent qualifications, references, personnel experience, certificates, financial figures, customers, permissions, or capacity.
+- User-confirmed onboarding data remains distinct from `VERIFIED` facts.
+- AI cannot invent qualifications, references, personnel experience, certificates, financial figures, customers, permissions, partners, commitments, availability, or capacity.
 - Expired evidence cannot satisfy a requirement without explicit review.
-- Partner evidence identifies the partner and permitted usage scope.
+- Partner evidence identifies the partner, commitment, validity, and permitted usage scope.
+- One person's skill does not automatically prove company-level delivery capability.
 
 ### Pricing
 
@@ -486,7 +516,9 @@ Product agents are bounded application workflows, never unrestricted autonomous 
 | Agent | Purpose | Critical restrictions |
 |---|---|---|
 | Opportunity Discovery | Normalize notices, detect likely IT relevance, deduplicate, detect amendments. | Cannot decide final GO or access arbitrary websites. |
-| Fit and Qualification | Compare opportunities with verified profile data and identify gaps/disqualifiers. | Hard rules remain deterministic; final GO/NO-GO is human. |
+| Fit and Qualification | Compare opportunities with verified profile data, run hard blockers, maintain separate direct/partner assessments, and identify gaps. | Hard rules remain deterministic; cannot convert unknown or user-confirmed data to verified; final GO/NO-GO is human. |
+| Partner Opportunity | Produce a bounded partner brief from tender rules and verified company/partner evidence. | Cannot invent partners, commitments, availability, permitted structure, or evidence-use permission. |
+| Growth Roadmap | Aggregate recurring blockers and evidence gaps into reviewable growth actions. | Cannot recommend hiring, certification, or expenditure from a single tender signal; human strategic approval required. |
 | Tender Analyst | Summarize procedure, lots, dates, evaluation, forms, and risks. | Every key point needs a citation; conflicts remain visible. |
 | Requirement Extraction | Create cited candidate requirements. | Human review required before authority. |
 | Compliance Matrix | Map requirements, responses, evidence, gaps, and contradictions. | Cannot approve or fabricate evidence. |
@@ -556,6 +588,8 @@ Product agents are bounded application workflows, never unrestricted autonomous 
 - preserve original tender language beside labeled translations;
 - display dates in `Europe/Tallinn` by default while preserving original timezone;
 - target WCAG 2.2 AA for core workflows;
+- show hard blockers before soft STARTER scores;
+- do not use success styling for `DIRECT_BID` while a blocking review is unresolved;
 - high-risk actions identify versions, require confirmation, and create audit events;
 - do not use optimistic UI for irreversible approvals or submission records.
 
@@ -607,13 +641,14 @@ Required categories include:
 - job retry/idempotency tests;
 - UI/component/accessibility tests;
 - Playwright core-workflow tests;
+- STARTER hard-blocker, direct/partner classification, unknown-evidence, partner-brief, and growth-roadmap tests;
 - AI schema, citation, claim, language, cost, and injection evaluations.
 
 Default tests never require paid APIs or production tender data.
 
 ## 18. Observability rules
 
-Expose safe metrics for HTTP, jobs, parsing, OCR, source freshness, AI usage/cost/policy blocks, opportunity states, unresolved requirements, deadlines, approvals, and exports.
+Expose safe metrics for HTTP, jobs, parsing, OCR, source freshness, AI usage/cost/policy blocks, opportunity states, STARTER classifications, hard blockers, partner/growth outcomes, unresolved requirements, deadlines, approvals, and exports.
 
 Metrics and logs must not contain document text, personal data, secrets, or unsafe high-cardinality identifiers.
 
@@ -660,6 +695,9 @@ Do not:
 - implement unrestricted autonomous agents;
 - trust unvalidated AI output;
 - use AI prose as an authorization decision;
+- classify an opportunity as safe for direct bidding while a known unresolved hard blocker exists;
+- treat missing company, worker, reference, financial, or partner data as satisfied;
+- invent a partner, commitment, capability, availability, or collaboration permission;
 - silently submit, email, sign, approve, or withdraw anything;
 - scrape authenticated portals without explicit approved support;
 - bypass CAPTCHA or identity verification;
@@ -718,15 +756,17 @@ Unless explicitly reprioritized:
 1. treat Phase 0 research tasks as complete;
 2. read `docs/product/PHASE_0_READINESS_REVIEW.md` before Phase 1 work;
 3. preserve every still-open M0 organizational approval gate;
-4. begin actual implementation with `S1-T01 — Create repository skeleton`;
+4. continue dependency-safe Phase 1 platform foundations;
 5. bootstrap repository quality and Docker foundations;
 6. implement authentication, authorization, audit, database, storage, and jobs;
-7. implement manual import and document integrity before external-source automation;
-8. implement approved RHR and TED adapters;
-9. implement company evidence, matching, requirements, and compliance;
-10. implement AI policy gates before Gemini-powered workflows;
-11. implement drafting, pricing, review, export, and human submission handoff;
-12. harden through evaluations, security testing, backup/restore, and a real pilot.
+7. implement company-profile/evidence foundations and the STARTER onboarding contracts when their dependencies exist;
+8. implement manual import and document integrity before external-source automation;
+9. implement approved RHR and TED adapters;
+10. implement requirement extraction and deterministic STARTER hard-blocker/direct/partner classification;
+11. implement partner briefs, growth actions, and human feedback before broad proposal automation displaces the initial user value;
+12. implement AI policy gates before Gemini-powered workflows;
+13. implement drafting, pricing, review, export, and human submission handoff;
+14. harden through STARTER evaluations, security testing, backup/restore, and a real pilot.
 
 Do not begin autonomous submission or advanced browser automation during the MVP.
 
@@ -735,8 +775,9 @@ Do not begin autonomous submission or advanced browser automation during the MVP
 The highest-value outcome is a trustworthy procurement workflow that can show:
 
 - where every requirement came from;
-- why an opportunity was selected;
-- which evidence supports every company claim;
+- why an opportunity was classified for direct bidding, partnership, growth, or no-go;
+- which hard blockers were found before scoring;
+- which evidence supports every company or partner claim;
 - who approved every binding decision;
 - which exact files were exported and submitted;
 - what data was sent to external AI;
