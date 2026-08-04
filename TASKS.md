@@ -194,13 +194,19 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
 
 ## Sprint 1.1 — Monorepo bootstrap
 
-- [ ] **S1-T01 — Create repository skeleton**
+- [x] **S1-T01 — Create repository skeleton**
   - Create directories defined in `README.md`.
   - Add `.editorconfig`, `.gitattributes`, `.gitignore`, root tooling, and documentation directories.
   - Acceptance:
     - Windows and Linux line-ending behavior is intentional;
     - secrets, volumes, uploads, generated files, and local tender data are ignored;
     - empty directories use documented placeholders only where needed.
+  - Verification:
+    - `git check-ignore -v` confirmed root-anchored runtime paths (`/data/`, `/db/`, `/volumes/`, `/redis/`, `/minio/`, `/local-tender-data/`) are ignored;
+    - `git check-ignore -v` confirmed source paths like `apps/api/app/db/models.py` and `apps/api/db/models.py` are NOT ignored;
+    - `.gitattributes` uses `* text=auto eol=lf` baseline with CRLF overrides only for Windows scripts (`*.ps1`, `*.bat`, `*.cmd`);
+    - `.editorconfig`, `.gitattributes`, and `.gitignore` all have terminating newlines;
+    - `.gitkeep` placeholders present in all 27 empty directories.
 
 - [ ] **S1-T02 — Bootstrap Next.js web application**
   - Use TypeScript strict mode and current stable supported dependencies.
