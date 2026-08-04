@@ -17,7 +17,8 @@ ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1
 
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -u 1001 -S nextjs -s /bin/sh -G nodejs
+    adduser -u 1001 -S nextjs -s /bin/sh -G nodejs && \
+    apk add --no-cache wget
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/public ./public

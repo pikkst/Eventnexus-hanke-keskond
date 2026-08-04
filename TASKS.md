@@ -258,8 +258,8 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - `apps/api/Dockerfile`, `apps/worker/Dockerfile`, and `apps/web/Dockerfile` use multi-stage builds with pinned base image tags (`python:3.12.8-slim-bookworm`, `node:22.11.0-alpine3.19`);
     - `.env.example` removed from runtime stages; `.dockerignore` files exclude `.env`, `.env.*`, and caches;
     - runtime containers run as non-root users (`eventnexus` for api/worker, `nextjs` for web);
-    - health checks added to `apps/web/Dockerfile`; existing checks preserved for api and worker;
-    - `docs/runbooks/VULNERABILITY_SCANNING.md` documents Trivy/Grype/Docker Scout scanning and CI integration.
+    - health checks added to `apps/web/Dockerfile` with explicit `wget` installation; existing checks preserved for api and worker;
+    - `docs/runbooks/VULNERABILITY_SCANNING.md` documents Trivy/Grype/Docker Scout scanning, CI integration with pinned action versions, production digest pinning guidance, and required verification evidence.
 
 - [ ] **S1-T08 — Add development overrides**
   - Create `docker-compose.dev.yml` for hot reload, test mail, and developer-friendly mounts.
