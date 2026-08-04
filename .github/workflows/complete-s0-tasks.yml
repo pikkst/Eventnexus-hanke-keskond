@@ -1,0 +1,60 @@
+name: Complete S0 task status update
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/complete-s0-tasks.yml
+
+permissions:
+  contents: write
+
+jobs:
+  update-task-status:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Mark completed tasks
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          task_file = Path("TASKS.md")
+          text = task_file.read_text(encoding="utf-8")
+
+          replacements = {
+              "- [ ] **S0-T01 — Write the product requirements document**":
+                  "- [x] **S0-T01 — Write the product requirements document**",
+              "- [ ] **S0-T02 — Define Eventnexus OÜ company profile requirements**":
+                  "- [x] **S0-T02 — Define Eventnexus OÜ company profile requirements**",
+          }
+
+          for original, replacement in replacements.items():
+              count = text.count(original)
+              if count != 1:
+                  raise RuntimeError(
+                      f"Expected exactly one occurrence of {original!r}, found {count}."
+                  )
+              text = text.replace(original, replacement, 1)
+
+          task_file.write_text(text, encoding="utf-8")
+
+          workflow_file = Path(".github/workflows/complete-s0-tasks.yml")
+          if workflow_file.exists():
+              workflow_file.unlink()
+          PY
+
+      - name: Commit task status
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add TASKS.md .github/workflows/complete-s0-tasks.yml
+          git commit -m "docs(tasks): complete S0-T01 and S0-T02"
+          git push
