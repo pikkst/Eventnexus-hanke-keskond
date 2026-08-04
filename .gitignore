@@ -9,34 +9,34 @@ credentials.json
 *.p12
 *.pfx
 
-# Volumes and persistent data
-volumes/
-data/
-db/
-postgres/
-redis/
-minio/
+# Volumes and persistent data (root-anchored to avoid hiding source dirs like apps/api/db/)
+/volumes/
+/data/
+/db/
+/postgres/
+/redis/
+/minio/
 
-# Uploads and user-generated files
-uploads/
-tmp/
-temp/
-cache/
+# Uploads and user-generated files (root-anchored)
+/uploads/
+/tmp/
+/temp/
+/cache/
 
-# Generated files
-generated/
+# Generated files (root-anchored)
+/generated/
 *.generated.*
 *.min.js
 *.min.css
-coverage/
-dist/
-build/
-out/
-bin/
-obj/
+/coverage/
+/dist/
+/build/
+/out/
+/bin/
+/obj/
 
-# Local tender data directory
-local-tender-data/
+# Local tender data directory (root-anchored)
+/local-tender-data/
 
 # OS files
 .DS_Store
