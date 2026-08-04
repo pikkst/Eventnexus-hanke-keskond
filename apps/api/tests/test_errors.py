@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import subprocess
+from pathlib import Path
+
 import pytest
 from httpx import AsyncClient
 
@@ -56,6 +59,78 @@ class TestErrorHandlingInTestingMode:
         assert "errors" in body
         assert len(body["errors"]) > 0
 
+    async def test_validation_error_sanitizes_input(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.post(
+            "/test/validation",
+            json={"name": 123},
+        )
+        assert response.status_code == 422
+        body = response.json()
+        for error in body["errors"]:
+            assert error.get("input") == "<redacted>"
+
+    async def test_custom_validator_error_returns_422(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.post(
+            "/test/custom-validation", json={"code": "INVALID"}
+        )
+        assert response.status_code == 422
+        body = response.json()
+        assert body["error_code"] == "validation_error"
+        assert len(body["errors"]) > 0
+
+    async def test_custom_validator_error_sanitizes_ctx(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.post(
+            "/test/custom-validation", json={"code": "INVALID"}
+        )
+        assert response.status_code == 422
+        body = response.json()
+        for error in body["errors"]:
+            if "ctx" in error:
+                for _key, value in error["ctx"].items():
+                    assert not isinstance(value, Exception)
+
+    async def test_method_not_allowed_preserves_allow_header(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.post("/health")
+        assert response.status_code == 405
+        assert "allow" in response.headers
+        assert "GET" in response.headers["allow"]
+
+    async def test_correlation_header_is_single(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.get("/test/error")
+        assert response.status_code == 500
+        header_values = response.headers.get_list("x-request-id")
+        assert len(header_values) == 1
+
+    async def test_correlation_header_preserves_valid_client_id(
+        self, test_client: AsyncClient
+    ) -> None:
+        custom_id = "valid-correlation-id-123"
+        response = await test_client.get(
+            "/health", headers={"x-request-id": custom_id}
+        )
+        assert response.headers["x-request-id"] == custom_id
+
+    async def test_correlation_header_rejects_invalid_client_id(
+        self, test_client: AsyncClient
+    ) -> None:
+        response = await test_client.get(
+            "/health", headers={"x-request-id": "bad id with spaces!"}
+        )
+        assert response.status_code == 200
+        received = response.headers["x-request-id"]
+        assert received != "bad id with spaces!"
+        assert len(received) == 32
+
 
 @pytest.mark.asyncio
 class TestErrorHandlingInProductionMode:
@@ -99,6 +174,41 @@ class TestErrorHandlingInProductionMode:
     ) -> None:
         response = await prod_client.post("/test/validation", json={"name": ""})
         assert response.status_code == 422
+
+    async def test_production_method_not_allowed_preserves_allow_header(
+        self, prod_client: AsyncClient
+    ) -> None:
+        response = await prod_client.post("/health")
+        assert response.status_code == 405
+        assert "allow" in response.headers
+        assert "GET" in response.headers["allow"]
+
+    async def test_production_correlation_header_is_single(
+        self, prod_client: AsyncClient
+    ) -> None:
+        response = await prod_client.get("/test/error")
+        assert response.status_code == 500
+        header_values = response.headers.get_list("x-request-id")
+        assert len(header_values) == 1
+
+    async def test_production_cors_does_not_allow_wildcard(
+        self, prod_client: AsyncClient
+    ) -> None:
+        response = await prod_client.get(
+            "/health",
+            headers={"origin": "https://evil.example.com"},
+        )
+        assert response.status_code == 200
+        assert "access-control-allow-origin" not in response.headers
+
+    async def test_production_host_validation_blocks_unknown_hosts(
+        self, prod_client: AsyncClient
+    ) -> None:
+        response = await prod_client.get(
+            "/health",
+            headers={"host": "evil.example.com"},
+        )
+        assert response.status_code == 400
 
 
 class TestConfigurationValidation:
@@ -153,3 +263,46 @@ class TestConfigurationValidation:
                 secret_key="test-secret-key-for-testing-purposes-only",
                 log_format="invalid_format",
             )
+
+    def test_production_rejects_wildcard_allowed_hosts(self) -> None:
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError) as exc_info:
+            Settings(
+                app_env=AppEnvironment.PRODUCTION,
+                secret_key="a-very-secure-secret-key-with-32-chars!",
+                debug=False,
+                allowed_hosts=["*"],
+            )
+        assert "ALLOWED_HOSTS" in str(exc_info.value)
+
+    def test_production_rejects_wildcard_cors_origins(self) -> None:
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError) as exc_info:
+            Settings(
+                app_env=AppEnvironment.PRODUCTION,
+                secret_key="a-very-secure-secret-key-with-32-chars!",
+                debug=False,
+                cors_origins=["*"],
+            )
+        assert "CORS_ORIGINS" in str(exc_info.value)
+
+
+class TestDockerfileRegression:
+    def test_dockerfile_copies_app_before_pip_install(self) -> None:
+        dockerfile = Path(__file__).resolve().parents[1] / "Dockerfile"
+        content = dockerfile.read_text(encoding="utf-8")
+        deps_section = content.split("FROM base AS deps")[1].split("FROM base AS runtime")[0]
+        app_copy_index = deps_section.index("COPY app ./app")
+        pip_install_index = deps_section.index("pip install")
+        assert app_copy_index < pip_install_index
+
+    def test_dockerfile_builds(self) -> None:
+        dockerfile = Path(__file__).resolve().parents[1] / "Dockerfile"
+        result = subprocess.run(
+            ["docker", "build", "-t", "eventnexus-api-test", str(dockerfile.parent)],
+            capture_output=True,
+            text=True,
+        )
+        assert result.returncode == 0, result.stderr

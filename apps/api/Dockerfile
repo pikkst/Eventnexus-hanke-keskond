@@ -1,4 +1,5 @@
 FROM python:3.12-slim AS base
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
@@ -9,6 +10,7 @@ RUN groupadd -r -g 1001 eventnexus && \
 
 FROM base AS deps
 COPY pyproject.toml ./
+COPY app ./app
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir .
 

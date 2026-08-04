@@ -71,14 +71,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.add_middleware(
         TrustedHostMiddleware,
-        allowed_hosts=["*"],
+        allowed_hosts=settings.allowed_hosts,
     )
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=settings.cors_origins,
         allow_credentials=False,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_methods=settings.cors_methods,
+        allow_headers=settings.cors_headers,
     )
     app.add_middleware(CorrelationIdMiddleware)
 

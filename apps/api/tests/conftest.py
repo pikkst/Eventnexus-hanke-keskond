@@ -6,7 +6,7 @@ from typing import Annotated
 import pytest
 from fastapi import Body, FastAPI, Request
 from httpx import ASGITransport, AsyncClient
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.config import AppEnvironment, Settings
 from app.main import create_app
@@ -40,6 +40,17 @@ class _BodySchema(BaseModel):
     name: str = Field(min_length=1)
 
 
+class _CustomValidatorSchema(BaseModel):
+    code: str
+
+    @field_validator("code")
+    @classmethod
+    def validate_code_format(cls, v: str) -> str:
+        if not v.startswith("EV-"):
+            raise ValueError("Code must start with EV-")
+        return v
+
+
 def _add_test_routes(app: FastAPI) -> None:
     @app.get("/test/error")
     async def raise_error(request: Request) -> None:
@@ -49,6 +60,12 @@ def _add_test_routes(app: FastAPI) -> None:
     async def validation_error(
         data: Annotated[_BodySchema, Body()],
     ) -> _BodySchema:
+        return data
+
+    @app.post("/test/custom-validation")
+    async def custom_validation_error(
+        data: Annotated[_CustomValidatorSchema, Body()],
+    ) -> _CustomValidatorSchema:
         return data
 
 
@@ -79,12 +96,12 @@ def prod_app(prod_settings: Settings) -> FastAPI:
 @pytest.fixture
 async def test_client(test_app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=test_app, raise_app_exceptions=False)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport, base_url="http://localhost") as client:
         yield client
 
 
 @pytest.fixture
 async def prod_client(prod_app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     transport = ASGITransport(app=prod_app, raise_app_exceptions=False)
-    async with AsyncClient(transport=transport, base_url="http://test") as client:
+    async with AsyncClient(transport=transport, base_url="http://127.0.0.1") as client:
         yield client

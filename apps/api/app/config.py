@@ -46,6 +46,26 @@ class Settings(BaseSettings):
     log_level: str = Field(default="info", description="Log level")
     log_format: str = Field(default="json", description="Log format: json or console")
 
+    allowed_hosts: list[str] = Field(
+        default_factory=lambda: ["localhost", "127.0.0.1", "::1"],
+        description="Trusted host allowlist",
+    )
+
+    cors_origins: list[str] = Field(
+        default_factory=lambda: ["http://localhost:3000", "http://127.0.0.1:3000"],
+        description="CORS allowed origins",
+    )
+
+    cors_methods: list[str] = Field(
+        default_factory=lambda: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        description="CORS allowed methods",
+    )
+
+    cors_headers: list[str] = Field(
+        default_factory=lambda: ["Authorization", "Content-Type", "X-Requested-With"],
+        description="CORS allowed headers",
+    )
+
     @field_validator("log_level", mode="before")
     @classmethod
     def validate_log_level(cls, v: str) -> str:
@@ -71,6 +91,42 @@ class Settings(BaseSettings):
             return fmt
         return v
 
+    @field_validator("allowed_hosts", mode="before")
+    @classmethod
+    def validate_allowed_hosts(cls, v: list[str] | str | None) -> list[str]:
+        if v is None:
+            return ["localhost", "127.0.0.1", "::1"]
+        if isinstance(v, str):
+            return [item.strip() for item in v.split(",") if item.strip()]
+        return v
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def validate_cors_origins(cls, v: list[str] | str | None) -> list[str]:
+        if v is None:
+            return ["http://localhost:3000", "http://127.0.0.1:3000"]
+        if isinstance(v, str):
+            return [item.strip() for item in v.split(",") if item.strip()]
+        return v
+
+    @field_validator("cors_methods", mode="before")
+    @classmethod
+    def validate_cors_methods(cls, v: list[str] | str | None) -> list[str]:
+        if v is None:
+            return ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+        if isinstance(v, str):
+            return [item.strip().upper() for item in v.split(",") if item.strip()]
+        return v
+
+    @field_validator("cors_headers", mode="before")
+    @classmethod
+    def validate_cors_headers(cls, v: list[str] | str | None) -> list[str]:
+        if v is None:
+            return ["Authorization", "Content-Type", "X-Requested-With"]
+        if isinstance(v, str):
+            return [item.strip() for item in v.split(",") if item.strip()]
+        return v
+
     @model_validator(mode="after")
     def validate_critical_settings(self) -> Settings:
         if self.app_env == AppEnvironment.PRODUCTION:
@@ -81,6 +137,14 @@ class Settings(BaseSettings):
                 )
             if self.debug:
                 raise ValueError("DEBUG must be false when APP_ENV=production")
+            if "*" in self.allowed_hosts:
+                raise ValueError(
+                    "ALLOWED_HOSTS must not contain '*' when APP_ENV=production"
+                )
+            if "*" in self.cors_origins:
+                raise ValueError(
+                    "CORS_ORIGINS must not contain '*' when APP_ENV=production"
+                )
         return self
 
     def is_production(self) -> bool:
