@@ -1,0 +1,53 @@
+{
+  "fixture_version": 1,
+  "source": {
+    "system": "RHR",
+    "url": "https://riigihanked.riik.ee/rhr/api/public/v1/notice/4283918/html",
+    "notice_id": "4283918",
+    "retrieved_at": "2026-08-04T00:00:00Z",
+    "capture_type": "sanitized_public_notice_projection",
+    "schema_note": "EventNexus fixture contract, not an official RHR JSON schema"
+  },
+  "notice": {
+    "country": "EE",
+    "form_family": "competition",
+    "notice_type": "contract_notice_change",
+    "title": "Framework procurement for ICT-related works and services",
+    "procedure_id": "0f81c4a7-3b1f-481b-b17d-16f5cf652c53",
+    "procedure_reference": "276009",
+    "main_cpv": "72200000",
+    "estimated_value": {
+      "amount": "12000000.00",
+      "currency": "EUR",
+      "vat_included": false
+    },
+    "lots": [
+      {
+        "lot_id": "LOT-0001",
+        "title": "Software development",
+        "main_cpv": "72200000"
+      },
+      {
+        "lot_id": "LOT-0002",
+        "title": "ICT analysis, architecture, testing, and supporting services",
+        "main_cpv": "72200000"
+      }
+    ],
+    "change": {
+      "is_amendment": true,
+      "previous_notice_reference_required": true,
+      "reason": "information_updated",
+      "affected_scope": ["procedure_or_lot_data"],
+      "human_impact_review_required": true
+    },
+    "official_languages": ["et"]
+  },
+  "expected": {
+    "is_it_procurement": true,
+    "is_multi_lot": true,
+    "creates_new_source_version": true,
+    "does_not_overwrite_previous_version": true,
+    "run_deterministic_diff_before_ai_summary": true,
+    "invalidate_affected_analysis_only": true
+  }
+}
