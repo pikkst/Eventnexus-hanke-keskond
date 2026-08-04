@@ -223,7 +223,7 @@ Read [`AGENTS.md`](AGENTS.md) before starting any task. Do not check a task as c
     - production mode does not expose stack traces;
     - unit tests cover health and error responses.
 
-- [ ] **S1-T04 — Bootstrap worker application**
+- [x] **S1-T04 — Bootstrap worker application**
   - Select Celery or Dramatiq through ADR.
   - Add queue configuration, health reporting, sample idempotent job, retries, dead-letter strategy, and structured logs.
   - Acceptance:
