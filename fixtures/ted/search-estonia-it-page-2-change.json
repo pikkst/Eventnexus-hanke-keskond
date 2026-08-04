@@ -1,0 +1,37 @@
+{
+  "fixture_version": 1,
+  "request": {
+    "iterationNextToken": "fixture-token-page-2",
+    "paginationMode": "ITERATION",
+    "limit": 2
+  },
+  "response": {
+    "totalNoticeCount": 3,
+    "iterationNextToken": null,
+    "notices": [
+      {
+        "publication-number": "100003-2026",
+        "notice-identifier": "fixture-estonia-it-001",
+        "notice-version": "02",
+        "publication-date": "2026-08-01",
+        "notice-title": {"EST": "Infosüsteemi arendus- ja hooldustööd — muudatus"},
+        "notice-type": "cn-standard",
+        "procedure-identifier": "fixture-procedure-001",
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72200000", "72240000", "72254000"],
+        "deadline-receipt-tender-date-lot": ["2026-09-22"],
+        "deadline-receipt-tender-time-lot": ["11:00:00+03:00"],
+        "change-description": ["Tender deadline extended"],
+        "change-notice-version-identifier": ["fixture-estonia-it-001-01"],
+        "official-language": ["EST"]
+      }
+    ]
+  },
+  "expected": {
+    "end_of_iteration": true,
+    "creates_new_source_version": true,
+    "links_to_previous_version": true,
+    "deadline_change_is_material": true,
+    "invalidate_deadline_checks_and_submission_approval": true
+  }
+}
