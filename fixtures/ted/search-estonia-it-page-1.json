@@ -1,0 +1,58 @@
+{
+  "fixture_version": 1,
+  "request": {
+    "query": "(CY = \"EST\" OR RC = \"EST\") AND PC = \"72*\"",
+    "paginationMode": "ITERATION",
+    "limit": 2,
+    "checkQuerySyntax": true
+  },
+  "response": {
+    "totalNoticeCount": 3,
+    "iterationNextToken": "fixture-token-page-2",
+    "notices": [
+      {
+        "publication-number": "100001-2026",
+        "notice-identifier": "fixture-estonia-it-001",
+        "notice-version": "01",
+        "publication-date": "2026-07-30",
+        "notice-title": {"EST": "Infosüsteemi arendus- ja hooldustööd", "ENG": "Information system development and maintenance"},
+        "notice-type": "cn-standard",
+        "procedure-identifier": "fixture-procedure-001",
+        "buyer-name": {"EST": ["Näidisamet"]},
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72200000", "72240000", "72254000"],
+        "place-of-performance": ["EST"],
+        "deadline-receipt-tender-date-lot": ["2026-09-15"],
+        "deadline-receipt-tender-time-lot": ["11:00:00+03:00"],
+        "official-language": ["EST", "ENG"],
+        "lots": [
+          {"id": "LOT-0001", "title": "Analysis and development", "mainCpv": "72240000"},
+          {"id": "LOT-0002", "title": "Testing and maintenance", "mainCpv": "72254000"}
+        ],
+        "links": {"xml": "https://example.invalid/ted-fixture-001.xml"}
+      },
+      {
+        "publication-number": "100002-2026",
+        "notice-identifier": "fixture-estonia-it-002",
+        "notice-version": "01",
+        "publication-date": "2026-07-30",
+        "notice-title": {"ENG": "Cloud migration advisory services"},
+        "notice-type": "cn-standard",
+        "procedure-identifier": "fixture-procedure-002",
+        "buyer-name": {"ENG": ["Example Public Authority"]},
+        "buyer-country": ["EST"],
+        "classification-cpv": ["72222000", "72266000"],
+        "place-of-performance": ["EST"],
+        "deadline-receipt-tender-date-lot": ["2026-09-20"],
+        "official-language": ["ENG"]
+      }
+    ]
+  },
+  "expected": {
+    "persist_next_token_only_after_page_commit": true,
+    "notice_count": 2,
+    "multi_lot_notice_count": 1,
+    "preserve_language_variants": true,
+    "no_live_download_required": true
+  }
+}
