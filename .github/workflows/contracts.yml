@@ -26,7 +26,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install API dependencies
-        run: pip install fastapi uvicorn pydantic-settings structlog python-multipart
+        run: pip install fastapi "uvicorn[standard]" pydantic-settings structlog python-multipart
 
       - name: Install contracts tooling
         working-directory: packages/contracts
@@ -38,6 +38,7 @@ jobs:
 
       - name: Check for uncommitted changes
         run: |
+          set -x
           if ! git diff --exit-code; then
             echo "::error::Generated contract files are out of date."
             echo "Run 'npm run generate' in packages/contracts/ and commit the changes."
