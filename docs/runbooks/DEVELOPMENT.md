@@ -83,6 +83,10 @@ Configure application mail settings to use `mailhog:1025` as the SMTP host when 
 | api | `./apps/api:/app` | `uvicorn --reload` restarts on Python file changes |
 | worker | `./apps/worker:/app` | `uvicorn --factory --reload` restarts on Python file changes |
 
+## Worker architecture note
+
+The worker service is a FastAPI ASGI application. Its lifespan starts a Dramatiq worker in a background thread, and it exposes health and job endpoints on `localhost:8001`. Development mode therefore runs the worker through Uvicorn, consistent with the production Docker entrypoint. Hot reload restarts the ASGI app; the embedded Dramatiq worker is reinitialized on each reload.
+
 ## Verifying the stack
 
 ```bash
@@ -97,6 +101,33 @@ Health endpoints:
 - API: `http://localhost:8000/health`
 - Worker: `http://localhost:8001/health`
 - MailHog UI: `http://localhost:8025`
+
+## Validation and smoke tests
+
+After startup, verify each service:
+
+```bash
+# API health
+curl -s http://localhost:8000/health | jq .
+
+# Web health
+curl -s http://localhost:3000/api/health | jq .
+
+# Worker health
+curl -s http://localhost:8001/health | jq .
+```
+
+Send a test email through MailHog to confirm SMTP capture:
+
+```bash
+# Bash
+curl -s --url 'smtp://localhost:1025' --mail-from 'dev@localhost' --mail-rcpt 'test@localhost' -d 'Subject: test' -d 'Body: hello'
+
+# PowerShell
+Invoke-RestMethod -Uri 'smtp://localhost:1025' -Method Send -Headers @{ 'From' = 'dev@localhost'; 'To' = 'test@localhost' } -Body 'Subject: test`nBody: hello'
+```
+
+Then open `http://localhost:8025` to view the captured message.
 
 ## Production-like mode (no hot reload)
 
